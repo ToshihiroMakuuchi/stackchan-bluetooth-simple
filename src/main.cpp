@@ -819,6 +819,7 @@ void loop(void)
         avatar.setSpeechText("");
         M5.Speaker.tone(1000, 100);
         bluetooth_mode = true;
+        levelMeter = true;
         displevelMeter(true);
       }
       break;

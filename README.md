@@ -5,7 +5,7 @@
 mongonta0716さんの ｽﾀｯｸﾁｬﾝ Arduinoファームウェア”stackchan-bluetooth-simple”にレベルメーターやFaceチェンジ機能を追加ました<br>
 オリジナルはこちらです。<br>
 <https://github.com/mongonta0716/stackchan-bluetooth-simple><br>
-<br>
+
 ### 使い方 ###
 * Bluetoothモード時レベルメーターを表示できます。
 * レベルメーター表示部にタッチすると、レベルメーター表示をON/OFFできます。<br>
