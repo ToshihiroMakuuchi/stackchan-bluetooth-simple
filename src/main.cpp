@@ -13,9 +13,18 @@
 #include "Stackchan_servo.h"
 #include "BluetoothA2DPSink_M5Speaker.hpp"
 #include "Avatar.h"
+#include "Avatar.h"
+#include "AtaruFace.h"
+#include "RamFace.h"
+#include "DannFace.h"
+#include "DogFace.h"
+#include "ToraFace.h"
+#include "PaletteColor.h"
+#include <nvs.h>
 
 using namespace m5avatar;
 Avatar avatar;
+//Avatar* avatar;
 StackchanSERVO servo;
 
 #include "Stackchan_system_config.h"
@@ -37,6 +46,7 @@ bool bluetooth_mode = false;
 static float lipsync_level_max = LIPSYNC_LEVEL_MAX; // リップシンクの上限初期値
 float mouth_ratio = 0.0f;
 bool sing_happy = true;
+int BatteryLevel = -1;
 // Avatar関連の設定 end
 // --------------------
 
@@ -45,10 +55,343 @@ uint32_t last_discharge_time = 0;  // USB給電が止まったときの時間(ms
 /// set M5Speaker virtual channel (0-7)
 static constexpr uint8_t m5spk_virtual_channel = 0;
 
+// static BluetoothA2DPSink_M5Speaker a2dp_sink = { &M5.Speaker, m5spk_virtual_channel };
+// static fft_t fft;
+// static constexpr size_t WAVE_SIZE = 320;
+// static int16_t raw_data[WAVE_SIZE * 2];
+static constexpr size_t WAVE_SIZE = 320;
 static BluetoothA2DPSink_M5Speaker a2dp_sink = { &M5.Speaker, m5spk_virtual_channel };
 static fft_t fft;
-static constexpr size_t WAVE_SIZE = 320;
+static bool fft_enabled = false;
+static bool wave_enabled = false;
+static uint16_t prev_y[(FFT_SIZE / 2)+1];
+static uint16_t peak_y[(FFT_SIZE / 2)+1];
+static int16_t wave_y[WAVE_SIZE];
+static int16_t wave_h[WAVE_SIZE];
 static int16_t raw_data[WAVE_SIZE * 2];
+static int header_height = 0;
+
+static int px;  // draw volume bar
+// static int prev_level_x[2];
+// static int peak_level_x[2];
+static int prev_x[2];
+static int peak_x[2];
+    
+
+uint32_t bgcolor(LGFX_Device* gfx, int y)
+{
+  auto h = gfx->height()/4;
+  auto dh = h - header_height;
+  int v = ((h - y)<<5) / dh;
+  if (dh > 44)
+  {
+    int v2 = ((h - y - 1)<<5) / dh;
+    if ((v >> 2) != (v2 >> 2))
+    {
+      return 0x666666u;
+    }
+  }
+  return gfx->color888(v + 2, v, v + 6);
+}
+
+void gfxSetup(LGFX_Device* gfx)
+{
+  if (gfx == nullptr) { return; }
+  if (gfx->width() < gfx->height())
+  {
+    gfx->setRotation(gfx->getRotation()^1);
+  }
+  gfx->setFont(&fonts::lgfxJapanGothic_12);
+  gfx->setEpdMode(epd_mode_t::epd_fastest);
+  gfx->setCursor(0, 8);
+  gfx->print("BT A2DP : ");
+//  gfx->println(bt_device_name);
+  gfx->println(system_config.getBluetoothSetting()->device_name);
+  gfx->setTextWrap(false);
+  gfx->fillRect(0, 6, gfx->width(), 2, TFT_BLACK);
+
+//  header_height = (gfx->height() > 80) ? 45 : 21;
+  header_height = (gfx->height() > 80) ? 33 : 21;
+  fft_enabled = !gfx->isEPD();
+  if (fft_enabled)
+  {
+    wave_enabled = (gfx->getBoard() != m5gfx::board_M5UnitLCD);
+
+    for (int y = header_height; y < gfx->height()/4; ++y)
+    {
+      gfx->drawFastHLine(0, y, gfx->width(), bgcolor(gfx, y));
+    }
+  }
+
+  for (int x = 0; x < (FFT_SIZE/2)+1; ++x)
+  {
+//    prev_y[x] = INT16_MAX;
+    prev_y[x] = gfx->height()/4;
+    peak_y[x] = INT16_MAX;
+  }
+  for (int x = 0; x < WAVE_SIZE; ++x)
+  {
+    wave_y[x] = gfx->height()/4;
+    wave_h[x] = 0;
+  }
+
+  px = 0;  // draw volume bar
+  prev_x[0] = prev_x[1] = 0;
+  peak_x[0] = peak_x[1] = 0;
+
+}
+
+void gfxLoop(LGFX_Device* gfx)
+{
+  if (gfx == nullptr) { return; }
+  if (header_height > 32)
+  {
+    auto bits = a2dp_sink.getMetaUpdateInfo();
+    if (bits)
+    {
+      gfx->startWrite();
+      for (int id = 0; id < a2dp_sink.metatext_num; ++id)
+      {
+        if (0 == (bits & (1<<id))) { continue; }
+        size_t y = id * 12;
+        if (y+12 >= header_height) { continue; }
+        gfx->setCursor(4, 8 + y);
+        gfx->fillRect(0, 8 + y, gfx->width(), 12, gfx->getBaseColor());
+        gfx->print(a2dp_sink.getMetaData(id));
+        gfx->print(" "); // Garbage data removal when UTF8 characters are broken in the middle.
+      }
+      gfx->display();
+      gfx->endWrite();
+    }
+  }
+  else
+  {
+    static int title_x;
+    static int title_id;
+    static int wait = INT16_MAX;
+
+    if (a2dp_sink.getMetaUpdateInfo())
+    {
+      gfx->fillRect(0, 8, gfx->width(), 12, TFT_BLACK);
+      a2dp_sink.clearMetaUpdateInfo();
+      title_x = 4;
+      title_id = 0;
+      wait = 0;
+    }
+
+    if (--wait < 0)
+    {
+      int tx = title_x;
+      int tid = title_id;
+      wait = 3;
+      gfx->startWrite();
+      uint_fast8_t no_data_bits = 0;
+      do
+      {
+        if (tx == 4) { wait = 255; }
+        gfx->setCursor(tx, 8);
+        const char* meta = a2dp_sink.getMetaData(tid, false);
+        if (meta[0] != 0)
+        {
+          gfx->print(meta);
+          gfx->print("  /  ");
+          tx = gfx->getCursorX();
+          if (++tid == a2dp_sink.metatext_num) { tid = 0; }
+          if (tx <= 4)
+          {
+            title_x = tx;
+            title_id = tid;
+          }
+        }
+        else
+        {
+          if ((no_data_bits |= 1 << tid) == ((1 << a2dp_sink.metatext_num) - 1))
+          {
+            break;
+          }
+          if (++tid == a2dp_sink.metatext_num) { tid = 0; }
+        }
+      } while (tx < gfx->width());
+      --title_x;
+      gfx->display();
+      gfx->endWrite();
+    }
+  }
+  if (!gfx->displayBusy())
+  { // draw volume bar
+//    static int px;
+    uint8_t v = M5.Speaker.getChannelVolume(m5spk_virtual_channel);
+    int x = v * (gfx->width()) >> 8;
+    if (px != x)
+    {
+      gfx->fillRect(x, 6, px - x, 2, px < x ? 0xAAFFAAu : 0u);
+      gfx->display();
+      px = x;
+    }
+  }
+
+  if (fft_enabled && !gfx->displayBusy())
+  {
+    // static int prev_x[2];
+    // static int peak_x[2];
+    static bool prev_conn;
+    bool connected = a2dp_sink.is_connected();
+    if (prev_conn != connected)
+    {
+      prev_conn = connected;
+      if (!connected)
+      {
+        a2dp_sink.clear();
+      }
+    }
+
+    auto buf = a2dp_sink.getBuffer();
+    if (buf)
+    {
+      memcpy(raw_data, buf, WAVE_SIZE * 2 * sizeof(int16_t)); // stereo data copy
+      gfx->startWrite();
+
+      // draw stereo level meter
+      for (size_t i = 0; i < 2; ++i)
+      {
+        int32_t level = 0;
+        for (size_t j = i; j < 640; j += 32)
+        {
+          uint32_t lv = abs(raw_data[j]);
+          if (level < lv) { level = lv; }
+        }
+
+        int32_t x = (level * gfx->width()) / INT16_MAX;
+        int32_t px = prev_x[i];
+        if (px != x)
+        {
+          gfx->fillRect(x, i * 3, px - x, 2, px < x ? 0xFF9900u : 0x330000u);
+          prev_x[i] = x;
+        }
+        px = peak_x[i];
+        if (px > x)
+        {
+          gfx->writeFastVLine(px, i * 3, 2, TFT_BLACK);
+          px--;
+        }
+        else
+        {
+          px = x;
+        }
+        if (peak_x[i] != px)
+        {
+          peak_x[i] = px;
+          gfx->writeFastVLine(px, i * 3, 2, TFT_WHITE);
+        }
+      }
+      gfx->display();
+
+      // draw FFT level meter
+      fft.exec(raw_data);
+      size_t bw = gfx->width() / 60;
+      if (bw < 3) { bw = 3; }
+      int32_t dsp_height = gfx->height()/4;
+      int32_t fft_height = dsp_height - header_height - 1;
+      size_t xe = gfx->width() / bw;
+      if (xe > (FFT_SIZE/2)) { xe = (FFT_SIZE/2); }
+      int32_t wave_next = ((header_height + dsp_height) >> 1) + (((256 - (raw_data[0] + raw_data[1])) * fft_height) >> 17);
+
+      uint32_t bar_color[2] = { 0x000033u, 0x99AAFFu };
+
+//      int32_t lipsync_temp = 0;
+      for (size_t bx = 0; bx <= xe; ++bx)
+      {
+        size_t x = bx * bw;
+        if ((x & 7) == 0) { gfx->display(); taskYIELD(); }
+        int32_t f = fft.get(bx);
+        int32_t y = (f * fft_height) >> 18;
+//         if (x > 0 and x < 10) { // 0〜31の範囲でlipsyncでピックアップしたい音域を選びます。
+//           int32_t f1 = f * 100;
+//           lipsync_temp = std::max(lipsync_temp, f1 >> 19); // 指定した範囲で最も高い音量を設定。
+// //            lipsync_temp += (f1 >> 18);
+//         }
+        if (y > fft_height) { y = fft_height; }
+        y = dsp_height - y;
+        int32_t py = prev_y[bx];
+        if (y != py)
+        {
+          gfx->fillRect(x, y, bw - 1, py - y, bar_color[(y < py)]);
+          prev_y[bx] = y;
+        }
+        py = peak_y[bx] + 1;
+        if (py < y)
+        {
+          gfx->writeFastHLine(x, py - 1, bw - 1, bgcolor(gfx, py - 1));
+        }
+        else
+        {
+          py = y - 1;
+        }
+        if (peak_y[bx] != py)
+        {
+          peak_y[bx] = py;
+          gfx->writeFastHLine(x, py, bw - 1, TFT_WHITE);
+        }
+
+
+        if (wave_enabled)
+        {
+          for (size_t bi = 0; bi < bw; ++bi)
+          {
+            size_t i = x + bi;
+            if (i >= gfx->width() || i >= WAVE_SIZE) { break; }
+            y = wave_y[i];
+            int32_t h = wave_h[i];
+            bool use_bg = (bi+1 == bw);
+            if (h>0)
+            { /// erase previous wave.
+              gfx->setAddrWindow(i, y, 1, h);
+              h += y;
+              do
+              {
+                uint32_t bg = (use_bg || y < peak_y[bx]) ? bgcolor(gfx, y)
+                            : (y == peak_y[bx]) ? 0xFFFFFFu
+                            : bar_color[(y >= prev_y[bx])];
+                gfx->writeColor(bg, 1);
+              } while (++y < h);
+            }
+            size_t i2 = i << 1;
+            int32_t y1 = wave_next;
+            wave_next = ((header_height + dsp_height) >> 1) + (((256 - (raw_data[i2] + raw_data[i2 + 1])) * fft_height) >> 17);
+            int32_t y2 = wave_next;
+            if (y1 > y2)
+            {
+              int32_t tmp = y1;
+              y1 = y2;
+              y2 = tmp;
+            }
+            y = y1;
+            h = y2 + 1 - y;
+            wave_y[i] = y;
+            wave_h[i] = h;
+            if (h>0)
+            { /// draw new wave.
+              gfx->setAddrWindow(i, y, 1, h);
+              h += y;
+              do
+              {
+                uint32_t bg = (y < prev_y[bx]) ? 0xFFCC33u : 0xFFFFFFu;
+                gfx->writeColor(bg, 1);
+              } while (++y < h);
+            }
+          }
+        }
+      }
+//      lipsync_level = lipsync_temp; // リップシンクを設定
+      gfx->display();
+      gfx->endWrite();
+    }
+  }
+}
+
+bool servo_home = false;
+bool levelMeter = true;
+bool balloon = false;
 
 void servoLoop(void *args) {
   long move_time = 0;
@@ -59,6 +402,9 @@ void servoLoop(void *args) {
   float gaze_y = 0.0f;
   bool sing_mode = false;
   for (;;) {
+    if(!servo_home)
+    {
+
     if (mouth_ratio == 0.0f) {
       // 待機時の動き
       interval_time = random(system_config.getServoInterval(AvatarMode::NORMAL)->interval_min
@@ -77,6 +423,7 @@ void servoLoop(void *args) {
       sing_mode = true;
     } 
     avatar.getGaze(&gaze_y, &gaze_x);
+//    avatar.setRotation(gaze_x * 5);
     
 //    Serial.printf("x:%f:y:%f\n", gaze_x, gaze_y);
     // X軸は90°から+-で左右にスイング
@@ -105,11 +452,17 @@ void servoLoop(void *args) {
       // 歌っているときはうなずく
       servo.moveXY(move_x, move_y + 10, 400);
     }
+
+    } else {
+      servo.moveXY(START_DEGREE_VALUE_X, START_DEGREE_VALUE_Y, 500);
+    }
     vTaskDelay(interval_time/portTICK_PERIOD_MS);
 
   }
 }
 
+static fft_t fft1;
+static int16_t raw_data1[WAVE_SIZE * 2];
 
 void lipSync(void *args)
 {
@@ -120,10 +473,10 @@ void lipSync(void *args)
     uint64_t level = 0;
     auto buf = a2dp_sink.getBuffer();
     if (buf) {
-      memcpy(raw_data, buf, WAVE_SIZE * 2 * sizeof(int16_t));
-      fft.exec(raw_data);
+      memcpy(raw_data1, buf, WAVE_SIZE * 2 * sizeof(int16_t));
+      fft1.exec(raw_data1);
       for (size_t bx = 5; bx <= 60; ++bx) { // リップシンクで抽出する範囲はここで指定(低音)0〜64（高音）
-        int32_t f = fft.get(bx);
+        int32_t f = fft1.get(bx);
         level += abs(f);
         //Serial.printf("bx:%d, f:%d\n", bx, f) ;
       }
@@ -161,6 +514,129 @@ void avrc_metadata_callback(uint8_t data1, const uint8_t *data2)
 
 }
 
+Face* faces[7];
+const int facesSize = sizeof(faces) / sizeof(Face*);
+//int faceIdx = 1;
+int16_t faceIdx = 1;
+ColorPalette* cps[7];
+const int cpsSize = sizeof(cps) / sizeof(ColorPalette*);
+int cpsIdx = 0;
+const uint16_t color_table[facesSize] = {
+  TFT_BLACK,  //Default
+  TFT_WHITE,  //AtaruFace
+  TFT_WHITE,  //RamFace
+  0xef55,     //DannFace
+  TFT_WHITE,  //DogFace
+  0xef55,     //DannFace
+  TFT_YELLOW,  //ToraFace
+};
+
+void Avatar_setup(bool fullScreen) {
+//  avatar = new Avatar();
+  faces[0] = avatar.getFace();
+  faces[1] = new AtaruFace();
+  faces[2] = new RamFace();
+  faces[3] = new DannFace();
+  faces[4] = new DogFace();
+  faces[5] = avatar.getFace();
+  faces[6] = new ToraFace();
+
+  cps[0] = new ColorPalette();
+  cps[1] = new ColorPalette();
+  cps[2] = new ColorPalette();
+  cps[3] = new ColorPalette();
+  cps[4] = new ColorPalette();
+  cps[5] = new ColorPalette();
+  cps[6] = new ColorPalette();
+  cps[1]->set(COLOR_PRIMARY, PC_BLACK);  //AtaruFace
+  cps[1]->set(COLOR_SECONDARY, PC_WHITE);
+  cps[1]->set(COLOR_BACKGROUND, PC_WHITE);
+  cps[2]->set(COLOR_PRIMARY, PC_BLACK);  //RamFace
+  cps[2]->set(COLOR_SECONDARY, PC_WHITE);
+  cps[2]->set(COLOR_BACKGROUND, PC_WHITE);
+  cps[3]->set(COLOR_PRIMARY, PC_BLACK); //DannFace
+  cps[3]->set(COLOR_BACKGROUND, 9);
+  cps[3]->set(COLOR_SECONDARY, PC_WHITE);
+  cps[4]->set(COLOR_PRIMARY, PC_BLACK);  //DogFace
+  cps[4]->set(COLOR_SECONDARY, PC_WHITE);
+  cps[4]->set(COLOR_BACKGROUND, PC_WHITE);
+  cps[5] = cps[3];
+  cps[6]->set(COLOR_PRIMARY, PC_BLACK);  //DogFace
+  cps[6]->set(COLOR_SECONDARY, PC_WHITE);
+  cps[6]->set(COLOR_BACKGROUND, PC_YELLOW);
+
+  avatar.setFace(faces[faceIdx]);
+  avatar.setColorPalette(*cps[faceIdx]);
+  if(!fullScreen)
+  {
+    switch (M5.getBoard())
+    {
+      case m5::board_t::board_M5Stack:
+      case m5::board_t::board_M5StackCore2:
+      case m5::board_t::board_M5Tough:
+        avatar.setScale(0.80);
+        avatar.setOffset(0, 52);
+        break;
+      default:
+        avatar.setScale(1.00);
+        avatar.setOffset(0, 0);
+      break;
+    }
+  }
+  avatar.init(4); // start drawing
+//  avatar.draw();
+  avatar.addTask(lipSync, "lipSync");
+}
+void select_face(int idx){
+  avatar.setFace(faces[1]);
+  avatar.setColorPalette(*cps[1]);
+}
+
+struct box_t
+{
+  int x;
+  int y;
+  int w;
+  int h;
+  int touch_id = -1;
+
+  void setupBox(int x, int y, int w, int h) {
+    this->x = x;
+    this->y = y;
+    this->w = w;
+    this->h = h;
+  }
+  bool contain(int x, int y)
+  {
+    return this->x <= x && x < (this->x + this->w)
+        && this->y <= y && y < (this->y + this->h);
+  }
+};
+
+static box_t box_level;
+static box_t box_servo;
+static box_t box_balloon;
+static box_t box_face;
+
+void displevelMeter(bool levelMeter)
+{
+  if(levelMeter)
+  {
+    M5.Display.clear();
+    gfxSetup(&M5.Display);
+    M5.Display.fillRect(0, M5.Display.height()/4+1, M5.Display.width(), M5.Display.height(), color_table[faceIdx]); //
+    avatar.setScale(0.80);
+    avatar.setOffset(0, 52);
+    if(balloon) {
+      avatar.setSpeechText("");
+      balloon = false;
+    }
+  } else {
+    M5.Display.fillScreen(color_table[faceIdx]); //
+    avatar.setScale(1.0);
+    avatar.setOffset(0, 0);
+  }
+}
 
 void setup(void)
 {
@@ -190,6 +666,26 @@ void setup(void)
 
   M5.Speaker.begin();
 
+  {
+    uint32_t nvs_handle;
+    if (ESP_OK == nvs_open("Avatar", NVS_READONLY, &nvs_handle)) {
+      nvs_get_i16(nvs_handle, "faceIdx", &faceIdx);
+      if(faceIdx < 0 || faceIdx >= facesSize) {
+        faceIdx = 0;
+      }
+      nvs_close(nvs_handle);
+    }
+  }
+  {
+    uint32_t nvs_handle;
+    if (ESP_OK == nvs_open("BTSPK", NVS_READONLY, &nvs_handle)) {
+      size_t volume;
+      nvs_get_u32(nvs_handle, "volume", &volume);
+      M5.Speaker.setChannelVolume(m5spk_virtual_channel, volume);
+      nvs_close(nvs_handle);
+    }
+  }
+
   // BASICとFIREのV2.6で25MHzだと読み込めないため10MHzまで下げています。
   SD.begin(GPIO_NUM_4, SPI, 15000000);
   
@@ -208,9 +704,17 @@ void setup(void)
               system_config.getServoInfo()->servo_offset_y);
   delay(2000);
 
-  avatar.init(); // start drawing
+  levelMeter = bluetooth_mode;
+  if(bluetooth_mode){
+    gfxSetup(&M5.Display);
+    M5.Display.fillRect(0, M5.Display.height()/4+1, M5.Display.width(), M5.Display.height(), color_table[faceIdx]); //
+  }
+  Avatar_setup(!bluetooth_mode);
+  //  avatar.init(4); // start drawing
+  //  avatar.setScale(0.80);
+  //  avatar.setOffset(0, 52);
 
-  avatar.addTask(lipSync, "lipSync");
+  // avatar.addTask(lipSync, "lipSync");
   avatar.addTask(servoLoop, "servoLoop");
   avatar.setExpression(Expression::Neutral);
   avatar.setSpeechFont(system_config.getFont());
@@ -220,16 +724,23 @@ void setup(void)
     a2dp_sink.setHvtEventCallback(hvt_event_callback);
     a2dp_sink.start(system_config.getBluetoothSetting()->device_name.c_str(), true);
     avatar.setExpression(Expression::Sad);
-    avatar.setSpeechText("Bluetooth Mode");
+//    avatar.setSpeechText("Bluetooth Mode");
   } else {
     avatar.setSpeechText("Normal Mode");
   }
-
+  box_level.setupBox(0, 0, M5.Display.width(), 60);
+  box_servo.setupBox(80, 100, 80, 60);
+  box_face.setupBox(280, 100, 40, 60);
+  box_balloon.setupBox(0, 160, M5.Display.width(), 80);
 
 }
 
 void loop(void)
 {
+  static unsigned long long saveSettings = 0;
+  if(levelMeter) gfxLoop(&M5.Display);
+  avatar.draw();
+  if(!levelMeter && balloon)   avatar.setSpeechText(a2dp_sink.getMetaData(0, false));
 
   {
     static int prev_frame;
@@ -240,8 +751,60 @@ void loop(void)
     } while (prev_frame == (frame = millis() >> 3)); /// 8 msec cycle wait
     prev_frame = frame;
   }
+  static int lastms = 0;
+  if (millis()-lastms > 1000) {
+    lastms = millis();
+    BatteryLevel = M5.Power.getBatteryLevel();
+//    printf("%d\n\r",BatVoltage);
+   }
 
   M5.update();
+  auto count = M5.Touch.getCount();
+  if (count)
+  {
+    auto t = M5.Touch.getDetail();
+    if (t.wasPressed())
+    {    
+      if (box_level.contain(t.x, t.y) && bluetooth_mode)
+      {
+        levelMeter = !levelMeter;
+        displevelMeter(levelMeter);
+        M5.Speaker.tone(1000, 100);
+      }
+      if (box_servo.contain(t.x, t.y))
+      {
+        servo_home = !servo_home;
+        M5.Speaker.tone(1000, 100);
+      }
+      if (box_balloon.contain(t.x, t.y) && !levelMeter && bluetooth_mode)
+      {
+        balloon = !balloon;
+        if(!balloon) avatar.setSpeechText("");
+        M5.Speaker.tone(1000, 100);
+      }
+      if (box_face.contain(t.x, t.y))
+      {
+        faceIdx = (faceIdx + 1) % facesSize;
+        if(levelMeter)
+        {
+          M5.Display.fillRect(0, M5.Display.height()/4+1, M5.Display.width(), M5.Display.height(), color_table[faceIdx]); //Dann
+        } else {
+          M5.Display.fillScreen(color_table[faceIdx]); //Dann
+        }
+        avatar.setFace(faces[faceIdx]);
+        avatar.setColorPalette(*cps[faceIdx]);
+        {
+          uint32_t nvs_handle;
+          if (ESP_OK == nvs_open("Avatar", NVS_READWRITE, &nvs_handle)) {
+            nvs_set_i16(nvs_handle, "faceIdx", faceIdx);
+            nvs_close(nvs_handle);
+          }
+        }
+        M5.Speaker.tone(1000, 100);
+      }
+    }
+  }
+
   if (M5.BtnA.wasDeciedClickCount())
   {
     switch (M5.BtnA.getClickCount())
@@ -252,16 +815,20 @@ void loop(void)
         a2dp_sink.setHvtEventCallback(hvt_event_callback);
         a2dp_sink.start(system_config.getBluetoothSetting()->device_name.c_str(), true);
         avatar.setExpression(Expression::Sad);
-        avatar.setSpeechText("Bluetooth Mode");
+//        avatar.setSpeechText("Bluetooth Mode");
+        avatar.setSpeechText("");
         M5.Speaker.tone(1000, 100);
         bluetooth_mode = true;
+        displevelMeter(true);
       }
       break;
 
     case 2:
       if (bluetooth_mode) {
+        displevelMeter(false);
         avatar.setExpression(Expression::Neutral);
         avatar.setSpeechText("Normal Mode");
+        avatar.draw();
         M5.Speaker.tone(800, 100);
         a2dp_sink.stop();
         a2dp_sink.end(true);
@@ -279,6 +846,7 @@ void loop(void)
     M5.Speaker.tone(2000, 100);
     delay(200);
     M5.Speaker.tone(1000, 100);
+    saveSettings = millis() + 5000;
   }
   if (M5.BtnC.wasPressed()) {
     uint8_t volume = M5.Speaker.getChannelVolume(m5spk_virtual_channel);
@@ -287,7 +855,19 @@ void loop(void)
     M5.Speaker.tone(1000, 100);
     delay(200);
     M5.Speaker.tone(2000, 100);
+    saveSettings = millis() + 5000;
   }
+  if (saveSettings > 0 && millis() > saveSettings)
+  {
+    uint32_t nvs_handle;
+    if (ESP_OK == nvs_open("BTSPK", NVS_READWRITE, &nvs_handle)) {
+      size_t volume = M5.Speaker.getChannelVolume(m5spk_virtual_channel);
+      nvs_set_u32(nvs_handle, "volume", volume);
+      nvs_close(nvs_handle);
+    }
+    saveSettings = 0;
+  }
+
 #if not(defined(ARDUINO_M5STACK_FIRE) || defined(ARDUINO_M5Stack_Core_ESP32)) // FireはAxp192ではないのとI2Cが使えないので制御できません。
   if (M5.Power.Axp192.getACINVolatge() < 3.0f) {
     // USBからの給電が停止したとき

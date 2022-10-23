@@ -1,5 +1,21 @@
 # stackchan-bluetooth-simple
 
+
+---
+mongonta0716さんの ｽﾀｯｸﾁｬﾝ Arduinoファームウェア”stackchan-bluetooth-simple”にレベルメーターやFaceチェンジ機能を追加ました<br>
+オリジナルはこちらです。<br>
+<https://github.com/mongonta0716/stackchan-bluetooth-simple><br>
+<br>
+### 使い方 ###
+* Bluetoothモード時レベルメーターを表示できます。
+* レベルメーター表示部にタッチすると、レベルメーター表示をON/OFFできます。<br>
+* レベルメーター表示OFFの時、画面下部にタッチするとバルーンで曲名を表示します。<br>
+* 画面右端の中央付近にタッチするとFaceを切り替えられます。<br>
+* 画面中央にタッチすると首振りを止めます。<br><br>
+
+---
+
+
 日本語 | [English](README_en.md)
 
 # 概要
@@ -25,7 +41,7 @@ Arduino-ESP32は2.0.4(Fireのみ2.0.0)で動作確認しています。M5Stack F
 
 詳しいバージョンについては[platformio.ini](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/platformio.ini)を見てください。
 
-- [M5Stack-Avatar](https://github.com/meganetaaan/m5stack-avatar)
+- ~~[M5Stack-Avatar](https://github.com/meganetaaan/m5stack-avatar)~~
 
 - [ServoEasing](https://github.com/ArminJo/ServoEasing)
 

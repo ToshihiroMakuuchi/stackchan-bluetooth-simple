@@ -107,9 +107,9 @@ void StackchanSystemConfig::setSystemConfig(DynamicJsonDocument doc) {
 }
 
 const lgfx::IFont* StackchanSystemConfig::getFont() {
-    if (_font_language_code.compareTo("JA")) {
+    if (_font_language_code.compareTo("JA") == 0) {
         return &fonts::efontJA_16;
-    } else if (_font_language_code.compareTo("CN")) {
+    } else if (_font_language_code.compareTo("CN") == 0) {
         return &fonts::efontCN_16;
     } else {
         Serial.printf("FontCodeError:%s\n", _font_language_code);

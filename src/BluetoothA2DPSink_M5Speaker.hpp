@@ -23,10 +23,12 @@ public:
   // get rawdata buffer for FFT.
   const int16_t* getBuffer(void) const { return _tri_buf[_export_index]; }
 
-  const char* getMetaData(size_t id) { _meta_bits &= ~(1<<id); return (id < metatext_num) ? _meta_text[id] : nullptr; }
-  
+//  const char* getMetaData(size_t id) { _meta_bits &= ~(1<<id); return (id < metatext_num) ? _meta_text[id] : nullptr; }
+  const char* getMetaData(size_t id, bool clear_flg = true) { if (clear_flg) { _meta_bits &= ~(1<<id); } return (id < metatext_num) ? _meta_text[id] : nullptr; }
+
 
   uint8_t getMetaUpdateInfo(void) const { return _meta_bits; }
+  void clearMetaUpdateInfo(void) { _meta_bits = 0; }
 
   void setHvtEventCallback(hvtEventCallback cb) { _hvt_evt_cb = cb; }
 
