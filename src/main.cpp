@@ -666,6 +666,24 @@ void setup(void)
 
   M5.Speaker.begin();
 
+  // BASICとFIREのV2.6で25MHzだと読み込めないため10MHzまで下げています。
+  SD.begin(GPIO_NUM_4, SPI, 15000000);
+  
+  delay(1000);
+  system_config.loadConfig(json_fs, stackchan_system_config_yaml);
+  
+  M5.Speaker.setVolume(system_config.getBluetoothSetting()->start_volume);
+  M5.Speaker.setChannelVolume(system_config.getBluetoothSetting()->start_volume, m5spk_virtual_channel);
+
+  bluetooth_mode = system_config.getBluetoothSetting()->starting_state;
+  Serial.printf("Bluetooth_mode:%s\n", bluetooth_mode ? "true" : "false");
+  
+  servo.begin(system_config.getServoInfo()->servo_pin_x, START_DEGREE_VALUE_X,
+              system_config.getServoInfo()->servo_offset_x,
+              system_config.getServoInfo()->servo_pin_y, START_DEGREE_VALUE_Y,
+              system_config.getServoInfo()->servo_offset_y);
+  delay(2000);
+
   {
     uint32_t nvs_handle;
     if (ESP_OK == nvs_open("Avatar", NVS_READONLY, &nvs_handle)) {
@@ -685,24 +703,6 @@ void setup(void)
       nvs_close(nvs_handle);
     }
   }
-
-  // BASICとFIREのV2.6で25MHzだと読み込めないため10MHzまで下げています。
-  SD.begin(GPIO_NUM_4, SPI, 15000000);
-  
-  delay(1000);
-  system_config.loadConfig(json_fs, stackchan_system_config_yaml);
-  
-  M5.Speaker.setVolume(system_config.getBluetoothSetting()->start_volume);
-  M5.Speaker.setChannelVolume(system_config.getBluetoothSetting()->start_volume, m5spk_virtual_channel);
-
-  bluetooth_mode = system_config.getBluetoothSetting()->starting_state;
-  Serial.printf("Bluetooth_mode:%s\n", bluetooth_mode ? "true" : "false");
-  
-  servo.begin(system_config.getServoInfo()->servo_pin_x, START_DEGREE_VALUE_X,
-              system_config.getServoInfo()->servo_offset_x,
-              system_config.getServoInfo()->servo_pin_y, START_DEGREE_VALUE_Y,
-              system_config.getServoInfo()->servo_offset_y);
-  delay(2000);
 
   levelMeter = bluetooth_mode;
   if(bluetooth_mode){
