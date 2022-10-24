@@ -2,7 +2,7 @@
 
 
 ---
-mongonta0716さんの ｽﾀｯｸﾁｬﾝ Arduinoファームウェア”stackchan-bluetooth-simple”にレベルメーターやFaceチェンジ機能を追加ました<br>
+mongonta0716さんの ｽﾀｯｸﾁｬﾝ Arduinoファームウェア”stackchan-bluetooth-simple”にレベルメーターやFaceチェンジ機能を追加ました(Core2のみ）。<br>
 オリジナルはこちらです。<br>
 <https://github.com/mongonta0716/stackchan-bluetooth-simple><br>
 
