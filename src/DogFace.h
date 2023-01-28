@@ -71,21 +71,16 @@ void draw(M5Canvas *spi, BoundingRect rect, DrawContext *ctx) {
     spi->fillTriangle(x1, y1, x2, y2, x3, y3, (uint16_t)primaryColor);
     spi->fillTriangle(x2, y2, x3, y3, x4, y4, (uint16_t)primaryColor);
   } else if(exp == Expression::Doubt ||exp == Expression::Sleepy) {
-//  } else if(exp == Expression::Doubt || exp == Expression::Neutral || exp == Expression::Sleepy) {
     if (exp == Expression::Sleepy) {
-      y = y + 20;
+      y = y + 18;
     }
     int x1 = x - width / 2;
     int y1 = y - height / 2;
     spi->fillRect(x1, y1, width, height, (uint16_t)primaryColor);
   } else {
-//    int x1 = x - width / 2;
-//    int y1 = y - height / 2;
     if (exp == Expression::Happy) {
-//      y1 = y1 - 5;
         y = y - 5;
     }
-//    spi->fillRect(x1, y1, width, height, primaryColor);
     int x1, y1, x2, y2, x3, y3, x4, y4;
     int a = isLeft ^ (exp == Expression::Happy) ? -1 : 1;
     int dx = a * 1;
@@ -106,6 +101,7 @@ void draw(M5Canvas *spi, BoundingRect rect, DrawContext *ctx) {
 
 class DogEye : public Drawable {
   void draw(M5Canvas *spi, BoundingRect rect, DrawContext *ctx) {
+    Expression exp = ctx->getExpression();
     uint32_t cx = rect.getCenterX();
     uint32_t cy = rect.getCenterY();
     Gaze g = ctx->getGaze();
@@ -121,6 +117,11 @@ class DogEye : public Drawable {
       spi->fillRect(cx - 15, cy - 2, 30, 4, primaryColor);
       return;
     }
+    if (exp == Expression::Happy) {
+    spi->fillEllipse(cx, cy, 30, 25, primaryColor);
+    spi->fillEllipse(cx, cy, 25, 20, backgroundColor);
+    spi->fillRect(cx - 33, cy, 66, 30, (uint16_t)backgroundColor);
+    }else{
     spi->fillEllipse(cx, cy, 30, 25, primaryColor);
     spi->fillEllipse(cx, cy, 28, 23, backgroundColor);
 
@@ -128,6 +129,10 @@ class DogEye : public Drawable {
                      primaryColor);
     spi->fillEllipse(cx + offsetX - 3, cy + offsetY - 3, 3, 3,
                      backgroundColor);
+    }
+    if (exp == Expression::Sleepy) {    
+      spi->fillRect(cx - 30, cy - 25, 60, 25, (uint16_t)backgroundColor);
+    }
   }
 };
 
@@ -149,7 +154,6 @@ class DogMouth : public Drawable {
   void draw(M5Canvas *spi, BoundingRect rect, DrawContext *ctx) {
     uint16_t primaryColor = ctx->getColorDepth() == 1 ? 1 : ctx->getColorPalette()->get(COLOR_PRIMARY);
     uint16_t backgroundColor = ctx->getColorDepth() == 1 ? 0 : ctx->getColorPalette()->get(COLOR_BACKGROUND);
-//    uint16_t backgroundColor = COLOR_DEPTH == 1 ? ERACER_COLOR : ctx->getColorPalette()->get(COLOR_BACKGROUND);
     uint32_t cx = rect.getCenterX();
     uint32_t cy = rect.getCenterY();
     float openRatio = ctx->getMouthOpenRatio();

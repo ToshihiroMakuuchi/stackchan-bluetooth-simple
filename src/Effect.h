@@ -101,28 +101,36 @@ class Effect final : public Drawable {
 //    } else {
 //      spi->fillRect(20, 22, BatteryLevel/5, 10, TFT_RED);      
 //    }
+if (BatteryLevel >= 0){
     spi->fillRect(19, 21, 22, 12, 1);
     if(BatteryLevel > 30) {
       spi->fillRect(20, 22, BatteryLevel/5, 10, 5);
     } else {
       spi->fillRect(20, 22, BatteryLevel/5, 10, 4);      
     }
+}
     switch (exp) {
       case Expression::Doubt:
-        drawSweatMark(spi, 290, 110, 7, primaryColor, -offset);
+//        drawSweatMark(spi, 290, 110, 7, primaryColor, -offset);
+        drawSweatMark(spi, 290, 110, 7, 4, -offset);
         break;
       case Expression::Angry:
-        drawAngerMark(spi, 280, 50, 12, primaryColor, bgColor, offset);
+//        drawAngerMark(spi, 280, 50, 12, primaryColor, bgColor, offset);
+        drawAngerMark(spi, 280, 50, 12, 3, bgColor, offset);
         break;
       case Expression::Happy:
-        drawHeartMark(spi, 280, 50, 12, primaryColor, offset);
+//        drawHeartMark(spi, 280, 50, 12, primaryColor, offset);
+        drawHeartMark(spi, 280, 50, 12, 3, offset);
         break;
       case Expression::Sad:
-        drawChillMark(spi, 270, 0, 30, primaryColor, offset);
+//        drawChillMark(spi, 270, 0, 30, primaryColor, offset);
+        drawChillMark(spi, 270, 0, 30, 4, offset);
         break;
       case Expression::Sleepy:
-        drawBubbleMark(spi, 290, 40, 10, primaryColor, offset);
-        drawBubbleMark(spi, 270, 52, 6, primaryColor, -offset);
+        // drawBubbleMark(spi, 290, 40, 10, primaryColor, offset);
+        // drawBubbleMark(spi, 270, 52, 6, primaryColor, -offset);
+        drawBubbleMark(spi, 290, 40, 10, 4, offset);
+        drawBubbleMark(spi, 270, 52, 6, 4, -offset);
         break;
       default:
         // noop

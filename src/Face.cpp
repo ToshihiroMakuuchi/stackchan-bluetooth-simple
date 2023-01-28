@@ -126,23 +126,25 @@ Drawable *Face::getRightEye() { return eyeR; }
 BoundingRect *Face::getBoundingRect() { return boundingRect; }
 
 void Face::draw(DrawContext *ctx) {
+  sprite->createSprite(boundingRect->getWidth(), boundingRect->getHeight());
   sprite->setColorDepth(ctx->getColorDepth());
-  sprite->setPaletteColor(1, 0x000000U);    // �p���b�g1�Ԃ����ɐݒ�
-  sprite->setPaletteColor(2, 0xFFFFFFU);    // �p���b�g2�Ԃ𔒂ɐݒ�
-  sprite->setPaletteColor(3, 0xFF0000U);    // �p���b�g3�Ԃ�Ԃɐݒ�
-//  sprite->setPaletteColor(4, 0xF6F399U);    // �p���b�g4�Ԃ�X�ɐݒ�
-  sprite->setPaletteColor(4, 0x0000FFU);    // �p���b�g4�Ԃ�ɐݒ�
-  sprite->setPaletteColor(5, 0x00FF00U);    // �p���b�g5�Ԃ�΂ɐݒ�
-  sprite->setPaletteColor(6, 0xFFFF00U);    // �p���b�g6�Ԃ����F�ɐݒ�
-  sprite->setPaletteColor(7, 0xFFC0CBU);    // �p���b�g7�Ԃ��s���N�ɐݒ�
-  sprite->setPaletteColor(8, 0x964800U);    // �p���b�g8�Ԃ�BROWN�ɐݒ�
-  sprite->setPaletteColor(9, 0xEEE8AAU);    // �p���b�g9�Ԃ�BROWN�ɐݒ�
-  sprite->setPaletteColor(10, 0xD3D3D3U);    // �p���b�g10�Ԃ�LIGHTGREY�ɐݒ�
+  sprite->setPaletteColor(1, 0x000000U);    // パレット1番を黒に設定
+  sprite->setPaletteColor(2, 0xFFFFFFU);    // パレット2番を白に設定
+  sprite->setPaletteColor(3, 0xFF0000U);    // パレット3番を赤に設定
+//  sprite->setPaletteColor(4, 0xF6F399U);    // パレット4番をXに設定
+  sprite->setPaletteColor(4, 0x0000FFU);    // パレット4番を青に設定
+  sprite->setPaletteColor(5, 0x00FF00U);    // パレット5番を緑に設定
+  sprite->setPaletteColor(6, 0xFFFF00U);    // パレット6番を黄色に設定
+  sprite->setPaletteColor(7, 0xFFC0CBU);    // パレット7番をピンクに設定
+//  sprite->setPaletteColor(8, 0x964800U);    // パレット8番をBROWNに設定
+  sprite->setPaletteColor(8, 0x984C00U);    // パレット8番をBROWNに設定
+  sprite->setPaletteColor(9, 0xEEE8AAU);    // パレット9番をXXXXXに設定
+  sprite->setPaletteColor(10, 0xD3D3D3U);    // パレット10番をLIGHTGREYに設定
   
   // NOTE: setting below for 1-bit color depth
   sprite->setBitmapColor(ctx->getColorPalette()->get(COLOR_PRIMARY),
-    ctx->getColorPalette()->get(COLOR_BACKGROUND));
-  sprite->createSprite(boundingRect->getWidth(), boundingRect->getHeight());
+  ctx->getColorPalette()->get(COLOR_BACKGROUND));
+//  sprite->createSprite(boundingRect->getWidth(), boundingRect->getHeight());
   if (ctx->getColorDepth() != 1) {
     sprite->fillSprite(ctx->getColorPalette()->get(COLOR_BACKGROUND));
   }

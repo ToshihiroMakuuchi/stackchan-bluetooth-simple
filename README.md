@@ -6,6 +6,8 @@ mongonta0716さんの ｽﾀｯｸﾁｬﾝ Arduinoファームウェア”stack
 オリジナルはこちらです。<br>
 <https://github.com/mongonta0716/stackchan-bluetooth-simple><br>
 
+どーもくん (C)NHK・TYO の画像をを使用しています。<br>
+
 ### 使い方 ###
 * Bluetoothモード時レベルメーターを表示できます。
 * レベルメーター表示部にタッチすると、レベルメーター表示をON/OFFできます。<br>

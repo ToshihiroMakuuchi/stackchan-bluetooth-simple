@@ -19,6 +19,7 @@
 #include "DannFace.h"
 #include "DogFace.h"
 #include "ToraFace.h"
+#include "DoomoFace.h"
 #include "PaletteColor.h"
 #include <nvs.h>
 
@@ -55,10 +56,6 @@ uint32_t last_discharge_time = 0;  // USB給電が止まったときの時間(ms
 /// set M5Speaker virtual channel (0-7)
 static constexpr uint8_t m5spk_virtual_channel = 0;
 
-// static BluetoothA2DPSink_M5Speaker a2dp_sink = { &M5.Speaker, m5spk_virtual_channel };
-// static fft_t fft;
-// static constexpr size_t WAVE_SIZE = 320;
-// static int16_t raw_data[WAVE_SIZE * 2];
 static constexpr size_t WAVE_SIZE = 320;
 static BluetoothA2DPSink_M5Speaker a2dp_sink = { &M5.Speaker, m5spk_virtual_channel };
 static fft_t fft;
@@ -72,8 +69,6 @@ static int16_t raw_data[WAVE_SIZE * 2];
 static int header_height = 0;
 
 static int px;  // draw volume bar
-// static int prev_level_x[2];
-// static int peak_level_x[2];
 static int prev_x[2];
 static int peak_x[2];
     
@@ -435,6 +430,10 @@ void servoLoop(void *args) {
     // Y軸は90°から上にスイング（最大35°）
     move_y = START_DEGREE_VALUE_Y - mouth_ratio * 10 - abs(25.0 * gaze_y);
     servo.moveXY(move_x, move_y, move_time);
+    } else {
+      servo.moveXY(START_DEGREE_VALUE_X, START_DEGREE_VALUE_Y, 500);
+    }
+
     if (!bluetooth_mode) {
       int lyric_no = random(system_config.getLyrics_num());
       int exp2 = random(2);
@@ -448,14 +447,14 @@ void servoLoop(void *args) {
       avatar.setMouthOpenRatio(0.5f);
     }
     //avatar.setExpression((Expression)exp);
-    if (sing_mode) {
+    if (sing_mode && !servo_home) {
       // 歌っているときはうなずく
       servo.moveXY(move_x, move_y + 10, 400);
     }
 
-    } else {
-      servo.moveXY(START_DEGREE_VALUE_X, START_DEGREE_VALUE_Y, 500);
-    }
+    // } else {
+    //   servo.moveXY(START_DEGREE_VALUE_X, START_DEGREE_VALUE_Y, 500);
+    // }
     vTaskDelay(interval_time/portTICK_PERIOD_MS);
 
   }
@@ -499,7 +498,7 @@ void lipSync(void *args)
 
 void hvt_event_callback(int avatar_expression, const char* text) {
   avatar.setExpression((Expression)avatar_expression);
-  avatar.setSpeechText(text);
+  if(!levelMeter && bluetooth_mode) avatar.setSpeechText(text);
 }
 
 void avrc_metadata_callback(uint8_t data1, const uint8_t *data2)
@@ -514,11 +513,11 @@ void avrc_metadata_callback(uint8_t data1, const uint8_t *data2)
 
 }
 
-Face* faces[7];
+Face* faces[8];
 const int facesSize = sizeof(faces) / sizeof(Face*);
 //int faceIdx = 1;
 int16_t faceIdx = 1;
-ColorPalette* cps[7];
+ColorPalette* cps[8];
 const int cpsSize = sizeof(cps) / sizeof(ColorPalette*);
 int cpsIdx = 0;
 const uint16_t color_table[facesSize] = {
@@ -529,6 +528,7 @@ const uint16_t color_table[facesSize] = {
   TFT_WHITE,  //DogFace
   0xef55,     //DannFace
   TFT_YELLOW,  //ToraFace
+  TFT_BROWN,  //DoomoFce
 };
 
 void Avatar_setup(bool fullScreen) {
@@ -540,6 +540,7 @@ void Avatar_setup(bool fullScreen) {
   faces[4] = new DogFace();
   faces[5] = avatar.getFace();
   faces[6] = new ToraFace();
+  faces[7] = new DoomoFace();
 
   cps[0] = new ColorPalette();
   cps[1] = new ColorPalette();
@@ -548,6 +549,7 @@ void Avatar_setup(bool fullScreen) {
   cps[4] = new ColorPalette();
   cps[5] = new ColorPalette();
   cps[6] = new ColorPalette();
+  cps[7] = new ColorPalette();
   cps[1]->set(COLOR_PRIMARY, PC_BLACK);  //AtaruFace
   cps[1]->set(COLOR_SECONDARY, PC_WHITE);
   cps[1]->set(COLOR_BACKGROUND, PC_WHITE);
@@ -564,6 +566,9 @@ void Avatar_setup(bool fullScreen) {
   cps[6]->set(COLOR_PRIMARY, PC_BLACK);  //DogFace
   cps[6]->set(COLOR_SECONDARY, PC_WHITE);
   cps[6]->set(COLOR_BACKGROUND, PC_YELLOW);
+  cps[7]->set(COLOR_PRIMARY, PC_BLACK);  //DoomoFce
+  cps[7]->set(COLOR_BACKGROUND, PC_BROWN);
+  cps[7]->set(COLOR_SECONDARY, PC_WHITE);
 
   avatar.setFace(faces[faceIdx]);
   avatar.setColorPalette(*cps[faceIdx]);
@@ -710,9 +715,6 @@ void setup(void)
     M5.Display.fillRect(0, M5.Display.height()/4+1, M5.Display.width(), M5.Display.height(), color_table[faceIdx]); //
   }
   Avatar_setup(!bluetooth_mode);
-  //  avatar.init(4); // start drawing
-  //  avatar.setScale(0.80);
-  //  avatar.setOffset(0, 52);
 
   // avatar.addTask(lipSync, "lipSync");
   avatar.addTask(servoLoop, "servoLoop");
@@ -724,7 +726,9 @@ void setup(void)
     a2dp_sink.setHvtEventCallback(hvt_event_callback);
     a2dp_sink.start(system_config.getBluetoothSetting()->device_name.c_str(), true);
     avatar.setExpression(Expression::Sad);
-//    avatar.setSpeechText("Bluetooth Mode");
+    avatar.setSpeechText("Bluetooth Mode");
+    delay(1000);
+    avatar.setSpeechText("");
   } else {
     avatar.setSpeechText("Normal Mode");
   }
@@ -740,7 +744,7 @@ void loop(void)
   static unsigned long long saveSettings = 0;
   if(levelMeter) gfxLoop(&M5.Display);
   avatar.draw();
-  if(!levelMeter && balloon)   avatar.setSpeechText(a2dp_sink.getMetaData(0, false));
+  if(!levelMeter && balloon && bluetooth_mode)   avatar.setSpeechText(a2dp_sink.getMetaData(0, false));
 
   {
     static int prev_frame;
@@ -826,6 +830,7 @@ void loop(void)
 
     case 2:
       if (bluetooth_mode) {
+        bluetooth_mode = false;
         displevelMeter(false);
         avatar.setExpression(Expression::Neutral);
         avatar.setSpeechText("Normal Mode");
@@ -835,7 +840,9 @@ void loop(void)
         a2dp_sink.end(true);
         delay(1000);
         avatar.setSpeechText("");
-        bluetooth_mode = false;
+        levelMeter = false;
+//        servo_home = false;
+//        bluetooth_mode = false;
       }
       break;
     }

@@ -2,15 +2,16 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full
 // license information.
 // modified by robo8080
+//どーもくん (C)NHK・TYO  
 
-#include "ToraEye.h"
+#include "DoomoEye.h"
 namespace m5avatar {
 
-ToraEye::ToraEye(uint16_t x, uint16_t y, uint16_t r, bool isLeft) : ToraEye(r, isLeft) {}
+DoomoEye::DoomoEye(uint16_t x, uint16_t y, uint16_t r, bool isLeft) : DoomoEye(r, isLeft) {}
 
-ToraEye::ToraEye(uint16_t r, bool isLeft) : r{r}, isLeft{isLeft} {}
+DoomoEye::DoomoEye(uint16_t r, bool isLeft) : r{r}, isLeft{isLeft} {}
 
-void ToraEye::draw(M5Canvas *spi, BoundingRect rect, DrawContext *ctx) {
+void DoomoEye::draw(M5Canvas *spi, BoundingRect rect, DrawContext *ctx) {
   Expression exp = ctx->getExpression();
   uint32_t x = rect.getCenterX();
   uint32_t y = rect.getCenterY();
@@ -58,4 +59,5 @@ void ToraEye::draw(M5Canvas *spi, BoundingRect rect, DrawContext *ctx) {
     spi->fillRect(x1, y1, w, h, primaryColor);
   }
 }
+
 }  // namespace m5avatar
