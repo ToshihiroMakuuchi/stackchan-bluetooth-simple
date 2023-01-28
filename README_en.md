@@ -16,15 +16,15 @@ It is modified based on Bluetooth_with_ESP32A2DP, which is an example of [M5Unif
 
 # Support Devices
 
-- M5Stack Basic/Gray/M5Go<br>Basic is only available with 16MB of Flash memory.
+- ~~M5Stack Basic/Gray/M5Go<br>Basic is only available with 16MB of Flash memory.~~
 
-- M5Stack Fire
+- ~~M5Stack Fire~~
 
 - M5Stack Core2 / Core2 for AWSIoT
 
 # Requirement
 
-Arduino-ESP32 is confirmed to work with 2.0.4 (Fire only 2.0.0). M5Stack Fire has a problem with arduino-esp32v2.0.4 and does not start.
+Arduino-ESP32 is confirmed to work with 2.0.4 (Fire only 2.0.0). ~~M5Stack Fire has a problem with arduino-esp32v2.0.4 and does not start.~~
 
 See [platformio.ini](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/platformio.ini) for detailed version information.
 
@@ -46,9 +46,9 @@ See [platformio.ini](https://github.com/mongonta0716/stackchan-bluetooth-simple/
 
 # Compile Notes
 
-- M5Stack Fire V2.6/M5Stack Basic V2.6<br>When using a TF card, we have confirmed an event that SD.begin() cannot be read at 20MHz. Lower it to 15MHz.
+- ~~M5Stack Fire V2.6/M5Stack Basic V2.6<br>When using a TF card, we have confirmed an event that SD.begin() cannot be read at 20MHz. Lower it to 15MHz.~~
 
-- M5Stack Basic V2.6<br>Please select `env:m5stack-grey` for env when compiling with VSCode+PlatformIO.
+- ~~M5Stack Basic V2.6<br>Please select `env:m5stack-grey` for env when compiling with VSCode+PlatformIO.~~
 
 # Settings
 If there is no YAML file for configuration on the SD card, the default values are used. (It is configured to connect servos to PortA.)

@@ -32,14 +32,14 @@ M5Stack-AvatarをベースにシンプルにBluetoothスピーカー機能とス
 
 # 対応機種
 
-- M5Stack Basic/Gray/M5Go<br>BasicはFlashメモリが16MBの機種のみです。
+- ~~M5Stack Basic/Gray/M5Go<br>BasicはFlashメモリが16MBの機種のみです。~~
 
-- M5Stack Fire
+- ~~M5Stack Fire~~
 
 - M5Stack Core2 / Core2 for AWSIoT
 
 # 必要なライブラリ
-Arduino-ESP32は2.0.4(Fireのみ2.0.0)で動作確認しています。M5Stack Fireはarduino-esp32v2.0.4だと不具合があり起動しません。
+Arduino-ESP32は2.0.4(Fireのみ2.0.0)で動作確認しています。~~M5Stack Fireはarduino-esp32v2.0.4だと不具合があり起動しません。~~
 
 詳しいバージョンについては[platformio.ini](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/platformio.ini)を見てください。
 
@@ -61,9 +61,9 @@ Arduino-ESP32は2.0.4(Fireのみ2.0.0)で動作確認しています。M5Stack F
 
 # コンパイル時の注意
 
-- M5Stack Fire V2.6/M5Stack Basic V2.6<br>TFカードを使用する際にSD.begin()を20MHz以上では読み込めない事象を確認しました。15MHzに下げています。
+- ~~M5Stack Fire V2.6/M5Stack Basic V2.6<br>TFカードを使用する際にSD.begin()を20MHz以上では読み込めない事象を確認しました。15MHzに下げています。~~
 
-- M5Stack Basic V2.6<br>VSCode+PlatformIOでコンパイルするときのenvは`env:m5stack-grey`を選択してください。
+- ~~M5Stack Basic V2.6<br>VSCode+PlatformIOでコンパイルするときのenvは`env:m5stack-grey`を選択してください。~~
 
 # 設定
 SDカードに設定用のYAMLファイルがないとデフォルト値を利用します。（PortAへサーボを接続する設定になっています。）
