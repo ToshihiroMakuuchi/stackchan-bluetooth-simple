@@ -2,13 +2,20 @@
 
 
 ---
-mongonta0716さんの ｽﾀｯｸﾁｬﾝ Arduinoファームウェア”stackchan-bluetooth-simple”にレベルメーターやFaceチェンジ機能を追加ました(Core2のみ）。<br>
-オリジナルはこちらです。<br>
+## 2023年4月22日:
+robo8080さんの”stackchan-bluetooth-simple”をフォークし、FastLEDライブラリ＋NeoPixelEffectsを組み合わせしました。<br>
+ハードウェアは【M5Stack Core2 for AWS】を想定しています。
+robo8080さんが公開している本日時点でのソースは下記となります。<br>
+<https://github.com/robo8080/stackchan-bluetooth-simple>
+
+タカオさん(mongonta0716)の ｽﾀｯｸﾁｬﾝ Arduinoファームウェア”stackchan-bluetooth-simple”にレベルメーターやFaceチェンジ機能を追加ました(Core2のみ）。<br>
+タカオさんオリジナルはこちらです。<br>
 <https://github.com/mongonta0716/stackchan-bluetooth-simple><br>
 
 どーもくん (C)NHK・TYO の画像を使用しています。<br>
 
 ### 使い方 ###
+* このソースを用いてVSCode＋PlatformIO環境でビルドすると、Lチカが直ぐにできます。(詳しくはmain.cppをご確認ください)
 * Bluetoothモード時レベルメーターを表示できます。
 * レベルメーター表示部にタッチすると、レベルメーター表示をON/OFFできます。<br>
 * レベルメーター表示OFFの時、画面下部にタッチするとバルーンで曲名を表示します。<br>
@@ -22,6 +29,7 @@ mongonta0716さんの ｽﾀｯｸﾁｬﾝ Arduinoファームウェア”stack
 
 # 概要
 
+FastLEDライブラリ＋NeoPixelEffectsライブラリを搭載し、簡単にエフェクト機能を使えるようにしました。
 M5Stack-AvatarをベースにシンプルにBluetoothスピーカー機能とスタックチャンのサーボコントロール機能をつけました。
 [M5Unified](https://github.com/m5stack/M5Unified)のexampleであるBluetooth_with_ESP32A2DPをベースに改造しています。
 
@@ -80,8 +88,8 @@ SDカードに`/yaml/SC_Config.yaml`を配置すると自分の設定が利用�
         - x(Core1 22, Core2 33)<br> X軸のGPIOを指定
         - y(Core1 21, Core2 32)<br> Y軸のGPIOを指定
     - offset<br>サーボの軸が90°にしたときにズレを修正するパラメータ
-        - x(0)<br> X軸のオフセット値を設定
-        - y(0)<br> Y軸のオフセット値を設定
+        - x(0)<br> X軸のオフセット値を設定 (私の場合はズレていて+9しています)
+        - y(0)<br> Y軸のオフセット値を設定 (私の場合はズレていて+7しています)
 
     - speed<br>待機時とBluetoothスピーカーで音が出ているときの待機時間とサーボの移動時間を指定します。最小値と最大値で範囲を指定して、ランダムの値を使用します。
         - normal_mode
@@ -118,6 +126,7 @@ SDカードに`/yaml/SC_Config.yaml`を配置すると自分の設定が利用�
 - [lovyan03](https://github.com/lovyan03/LovyanGFX)
 - [robo8080](https://github.com/robo8080)
 - [tobozo](https://github.com/tobozo)
+- [ToshihiroMakuuchi(https://github.com/ToshihiroMakuuchi)
 
 # LICENSE
 [MIT](LICENSE)
