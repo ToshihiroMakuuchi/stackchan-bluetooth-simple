@@ -3,8 +3,8 @@
 
 ---
 ## 2023年4月22日:
-robo8080さんの”stackchan-bluetooth-simple”をフォークし、FastLEDライブラリ＋NeoPixelEffectsを組み合わせしました。
-ハードウェアは【M5Stack Core2 for AWS】を想定しています。
+robo8080さんの”stackchan-bluetooth-simple”をフォークし、FastLEDライブラリ＋[NeoPixelEffects](https://github.com/nolanmoore/NeoPixelEffects)を組み合わせしました。
+また、ハードウェアは【M5Stack Core2 for AWS】を想定しています。
 robo8080さんが公開している本日時点でのソースは下記となります。<br>
 <https://github.com/robo8080/stackchan-bluetooth-simple>
 
@@ -16,12 +16,32 @@ robo8080さんが公開している本日時点でのソースは下記となり
 
 ### 使い方 ###
 * このソースを用いてVSCode＋PlatformIO環境でビルドすると、M5Stack Core2 for AWSではLチカが直ぐにできます。<br>
-  (詳しくはmain.cppをご確認ください)
+  (変更は下記並びに[main.cpp](https://github.com/ToshihiroMakuuchi/stackchan-bluetooth-simple/blob/dev/src/main.cpp)ソース内コメントをご確認ください)
 * Bluetoothモード時レベルメーターを表示できます。
 * レベルメーター表示部にタッチすると、レベルメーター表示をON/OFFできます。<br>
 * レベルメーター表示OFFの時、画面下部にタッチするとバルーンで曲名を表示します。<br>
 * 画面右端の中央付近にタッチするとFaceを切り替えられます。<br>
 * 画面中央にタッチすると首振りを止めます。<br><br>
+
+
+## LEDエフェクト名称および有効パラメータ
+| Name | Range | AoE | Delay | Color | Looping | Direction | Description |
+| ----: | :-----: | :-----: |  :---: | :-----: | :-------: | :---------: | :--- |
+| COMET | Y | Y | Y | Y | Y | Y | LED光が尾をを引いて設定範囲内を移動するエフェクト |
+| LARSON | Y | Y | Y | Y | Y | Y | LED光が設定範囲内を往復するエフェクト |
+| CHASE | Y | ? | Y | Y | N | Y | シアターチェイス(モザイク)エフェクト |
+| PULSE | Y | N | Y | Y | Y | N | 設定範囲内でのゆっくりとした吐息のようなエフェクト |
+| STATIC | Y | N | Y | Y | N | N | テレビのヒューズ(切れ)のようなエフェクト |
+| FADE | Y | N | Y | N | N | N | 設定範囲内でフェードアウト＆エフェクト停止 |
+| FILLIN | Y | N | Y | Y | N | Y | 端から端へ満タン状態に光り停止するエフェクト |
+| GLOW | Y | Y | Y | Y | N | N | 設定範囲中央のLEDが光りそこで停止するエフェクト |
+| RAINBOWWAVE | Y | N | Y | N | N | Y | 動的レインボーグラデーションエフェクト |
+| STROBE | Y | N | Y | Y | N | N | 設定範囲内でのストロボエフェクト |
+| SINEWAVE | Y | N | Y | Y | N | Y | 設定範囲内で動く波のようなエフェクト |
+| RANDOM | Y | N | Y | N | N | N | パレード(パリピ)エフェクト |
+| TALKING | Y | N | Y | Y | N | N | ロボットのリップシンクのようなエフェクト |
+| TRIWAVE | Y | N | Y | Y | N | Y | 設定範囲内で動くノコギリ波のようなエフェクト |
+
 
 ---
 
