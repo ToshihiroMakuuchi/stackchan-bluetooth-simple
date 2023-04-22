@@ -22,6 +22,8 @@
 #include "DoomoFace.h"
 #include "PaletteColor.h"
 #include <nvs.h>
+#include "NeoPixelEffects.h"            // FastLED関連ライブラリ
+#include "FastLED.h"                    // FastLED
 
 using namespace m5avatar;
 Avatar avatar;
@@ -49,6 +51,28 @@ float mouth_ratio = 0.0f;
 bool sing_happy = true;
 int BatteryLevel = -1;
 // Avatar関連の設定 end
+// --------------------
+
+// --------------------
+// FastLED関連の初期設定
+#define DATA_PIN 25
+#define NUM_LEDS 10
+
+CRGB leds[NUM_LEDS];
+
+NeoPixelEffects effect = NeoPixelEffects(
+  leds,
+  RAINBOWWAVE,    // エフェクトの種類      effect
+  0,              // エフェクト開始位置    pixstart
+  9,              // エフェクト終了位置    pixend
+  5,              // 点灯する範囲(COMET等) aoe
+  80,             // エフェクトの間隔      delay_ms
+  CRGB::Magenta,  // 色(FastLED指定色)     color_crgb
+  true,           // ループするかどうか？  looping
+  FORWARD         // エフェクトの方向      direction
+);
+// 詳細はこちら: https://github.com/nolanmoore/NeoPixelEffects
+// FastLED関連の設定 end
 // --------------------
 
 uint32_t last_discharge_time = 0;  // USB給電が止まったときの時間(msec)
@@ -737,6 +761,9 @@ void setup(void)
   box_face.setupBox(280, 100, 40, 60);
   box_balloon.setupBox(0, 160, M5.Display.width(), 80);
 
+  FastLED.addLeds<NEOPIXEL,DATA_PIN>(leds, NUM_LEDS);        // FastLED関連
+  Serial.begin(9600);                                        // FastLED関連
+
 }
 
 void loop(void)
@@ -877,7 +904,7 @@ void loop(void)
   }
 
 #if not(defined(ARDUINO_M5STACK_FIRE) || defined(ARDUINO_M5Stack_Core_ESP32)) // FireはAxp192ではないのとI2Cが使えないので制御できません。
-  if (M5.Power.Axp192.getACINVolatge() < 3.0f) {
+  if (M5.Power.Axp192.getACINVoltage() < 3.0f) {
     // USBからの給電が停止したとき
     // Serial.println("USBPowerUnPlugged.");
     M5.Power.setLed(0);
@@ -895,6 +922,9 @@ void loop(void)
     }
   }
 #endif
+
+effect.update();        // FastLED関連
+FastLED.show();         // FastLED関連
 
 }
 
