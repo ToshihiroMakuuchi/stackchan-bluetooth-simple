@@ -90,7 +90,7 @@ Arduino-ESP32は2.0.4(Fireのみ2.0.0)で動作確認しています。~~M5Stack
 
 - [FastLED](https://github.com/FastLED/FastLED)
 
-- [NeoPixelEffects](https://github.com/nolanmoore/NeoPixelEffects)
+- [NeoPixelEffects](https://github.com/nolanmoore/NeoPixelEffects)<br>
 NeoPixelEffectsに関してのcppファイル、hファイルは直接src以下に保存します。
 
 
