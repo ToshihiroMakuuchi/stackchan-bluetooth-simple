@@ -3,7 +3,7 @@
 
 ---
 ## 2023年4月22日:
-robo8080さんの”stackchan-bluetooth-simple”をフォークし、FastLEDライブラリ＋NeoPixelEffectsを組み合わせしました。<br>
+robo8080さんの”stackchan-bluetooth-simple”をフォークし、FastLEDライブラリ＋NeoPixelEffectsを組み合わせしました。
 ハードウェアは【M5Stack Core2 for AWS】を想定しています。
 robo8080さんが公開している本日時点でのソースは下記となります。<br>
 <https://github.com/robo8080/stackchan-bluetooth-simple>
@@ -15,7 +15,8 @@ robo8080さんが公開している本日時点でのソースは下記となり
 どーもくん (C)NHK・TYO の画像を使用しています。<br>
 
 ### 使い方 ###
-* このソースを用いてVSCode＋PlatformIO環境でビルドすると、Lチカが直ぐにできます。(詳しくはmain.cppをご確認ください)
+* このソースを用いてVSCode＋PlatformIO環境でビルドすると、M5Stack Core2 for AWSではLチカが直ぐにできます。<br>
+  (詳しくはmain.cppをご確認ください)
 * Bluetoothモード時レベルメーターを表示できます。
 * レベルメーター表示部にタッチすると、レベルメーター表示をON/OFFできます。<br>
 * レベルメーター表示OFFの時、画面下部にタッチするとバルーンで曲名を表示します。<br>
@@ -49,7 +50,7 @@ M5Stack-AvatarをベースにシンプルにBluetoothスピーカー機能とス
 # 必要なライブラリ
 Arduino-ESP32は2.0.4(Fireのみ2.0.0)で動作確認しています。~~M5Stack Fireはarduino-esp32v2.0.4だと不具合があり起動しません。~~
 
-詳しいバージョンについては[platformio.ini](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/platformio.ini)を見てください。
+詳しいバージョンについては[platformio.ini](https://github.com/ToshihiroMakuuchi/stackchan-bluetooth-simple/blob/main/platformio.ini)を見てください。
 
 - ~~[M5Stack-Avatar](https://github.com/meganetaaan/m5stack-avatar)~~
 
@@ -126,7 +127,7 @@ SDカードに`/yaml/SC_Config.yaml`を配置すると自分の設定が利用�
 - [lovyan03](https://github.com/lovyan03/LovyanGFX)
 - [robo8080](https://github.com/robo8080)
 - [tobozo](https://github.com/tobozo)
-- [ToshihiroMakuuchi(https://github.com/ToshihiroMakuuchi)
+- [ToshihiroMakuuchi](https://github.com/ToshihiroMakuuchi)
 
 # LICENSE
 [MIT](LICENSE)
