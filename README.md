@@ -15,8 +15,9 @@ robo8080さんが公開している本日時点でのソースは下記となり
 どーもくん (C)NHK・TYO の画像を使用しています。<br>
 
 ### 使い方 ###
-* このソースを用いてVSCode＋PlatformIO環境でビルドすると、M5Stack Core2 for AWSではLチカが直ぐにできます。<br>
+* このソースを用いてVSCode＋PlatformIO環境でビルドすると、M5Stack Core2 for AWS、またはM5GoBottom2を利用しLチカが直ぐにできます。<br>
   (変更は下記並びに[main.cpp](https://github.com/ToshihiroMakuuchi/stackchan-bluetooth-simple/blob/dev/src/main.cpp)ソース内コメントをご確認ください)
+* for AWSやM5GoBottom2のLEDバー利用ピンは【25】が用いられ、またLED球は10個搭載されています。
 * Bluetoothモード時レベルメーターを表示できます。
 * レベルメーター表示部にタッチすると、レベルメーター表示をON/OFFできます。<br>
 * レベルメーター表示OFFの時、画面下部にタッチするとバルーンで曲名を表示します。<br>
