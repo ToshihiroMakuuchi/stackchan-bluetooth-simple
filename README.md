@@ -70,9 +70,9 @@ M5Stack-AvatarをベースにシンプルにBluetoothスピーカー機能とス
 # 必要なライブラリ
 Arduino-ESP32は2.0.4(Fireのみ2.0.0)で動作確認しています。~~M5Stack Fireはarduino-esp32v2.0.4だと不具合があり起動しません。~~
 
-詳しいバージョンについては[platformio.ini](https://github.com/ToshihiroMakuuchi/stackchan-bluetooth-simple/blob/dev/platformio.ini)を見てください。
+詳しいバージョンについては[platformio.ini](https://github.com/ToshihiroMakuuchi/stackchan-bluetooth-simple/blob/dev/platformio.ini)をご覧ください。
 
-- ~~[M5Stack-Avatar](https://github.com/meganetaaan/m5stack-avatar)~~
+- [M5Stack-Avatar](https://github.com/meganetaaan/m5stack-avatar)
 
 - [ServoEasing](https://github.com/ArminJo/ServoEasing)
 
@@ -87,6 +87,12 @@ Arduino-ESP32は2.0.4(Fireのみ2.0.0)で動作確認しています。~~M5Stack
 - [ArduinoJson](https://github.com/bblanchon/ArduinoJson)
 
 - [YAMLDuino](https://github.com/tobozo/YAMLDuino)
+
+- [FastLED](https://github.com/FastLED/FastLED)
+
+- [NeoPixelEffects](https://github.com/nolanmoore/NeoPixelEffects)
+NeoPixelEffectsに関してのcppファイル、hファイルは直接src以下に保存します。
+
 
 # コンパイル時の注意
 
