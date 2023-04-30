@@ -2,22 +2,29 @@
 
 
 ---
-## 2023年4月22日:
-robo8080さんの”stackchan-bluetooth-simple”をフォークし、FastLEDライブラリ＋[NeoPixelEffects](https://github.com/nolanmoore/NeoPixelEffects)を組み合わせしました。
-また、ハードウェアは【M5Stack Core2 for AWS】を想定しています。
-robo8080さんが公開している本日時点でのソースは下記となります。<br>
-<https://github.com/robo8080/stackchan-bluetooth-simple>
+## 2023年4月30日:
+main.cppで1つ、NeoPixelEffectsで2つの警告メッセージが出ていたものを修正しました。(関数非推奨となったところの修正、およびNULLの取扱い方を変更)<br>
+またNeoPixelEffects.h内で設定されるエフェクトを取り扱う変数名を【Effect⇒EffectType】に変更しました。
 
-タカオさん(mongonta0716)の ｽﾀｯｸﾁｬﾝ Arduinoファームウェア”stackchan-bluetooth-simple”にレベルメーターやFaceチェンジ機能を追加ました(Core2のみ）。<br>
-タカオさんオリジナルはこちらです。<br>
+
+## 2023年4月22日:
+robo8080さんの『stackchan-bluetooth-simple』をフォークし、FastLEDライブラリ＋[NeoPixelEffects](https://github.com/nolanmoore/NeoPixelEffects)を組み合わせました。<br>
+稼働ハードウェアは【M5Stack Core2 for AWS】もしくは【M5Stack Core2＋M5GoBottom2】を想定しています。<br>
+
+
+robo8080さんのソースは、タカオさん(mongonta0716)の ｽﾀｯｸﾁｬﾝ Arduinoファームウェア『stackchan-bluetooth-simple』にレベルメーターやFaceチェンジ機能を追加したものです。(稼働ハードウェアはCore2、Core2 for AWSのみ)<br>
+robo8080さんが公開している現時点のソースは下記となります。<br>
+<https://github.com/robo8080/stackchan-bluetooth-simple><br>
+タカオさんオリジナルソースは下記となります。<br>
 <https://github.com/mongonta0716/stackchan-bluetooth-simple><br>
 
-どーもくん (C)NHK・TYO の画像を使用しています。<br>
+どーもくん (C)NHK・TYO の画像を選択することができます。<br>
+
 
 ### 使い方 ###
-* このソースを用いてVSCode＋PlatformIO環境でビルドすると、M5Stack Core2 for AWS、またはM5GoBottom2を利用しLチカが直ぐにできます。<br>
+* このソースを用いてVSCode＋PlatformIO環境でビルドすると、M5Stack Core2 for AWS、またはM5Stack Core2にM5GoBottom2を追加し、Lチカ処理を直ぐに確認することができます。<br>
   (変更は下記並びに[main.cpp](https://github.com/ToshihiroMakuuchi/stackchan-bluetooth-simple/blob/dev/src/main.cpp)ソース内コメントをご確認ください)
-* for AWSやM5GoBottom2のLEDバー利用ピンは【25】が用いられ、またLED球は10個搭載されています。
+* Core2 for AWSやM5GoBottom2のLEDバーの使用するデータピンは【25】が用いられ、またLED球は10個搭載されています。
 * Bluetoothモード時レベルメーターを表示できます。
 * レベルメーター表示部にタッチすると、レベルメーター表示をON/OFFできます。<br>
 * レベルメーター表示OFFの時、画面下部にタッチするとバルーンで曲名を表示します。<br>
