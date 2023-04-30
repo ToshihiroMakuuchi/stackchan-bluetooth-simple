@@ -3,16 +3,17 @@
 
 ---
 ## 2023年4月30日:
-main.cppで1つ、NeoPixelEffectsで2つの警告メッセージが出ていたものを修正しました。(関数非推奨となったところの修正、およびNULLの取扱い方を変更)<br>
+main.cppで1つ、NeoPixelEffectsで2つの警告メッセージが出ていたものを修正しました。<br>
+(関数非推奨となったところの修正、およびNULLの取扱い方を変更)<br>
 またNeoPixelEffects.h内で設定されるエフェクトを取り扱う変数名を【Effect⇒EffectType】に変更しました。
 
 
 ## 2023年4月22日:
-robo8080さんの『stackchan-bluetooth-simple』をフォークし、FastLEDライブラリ＋[NeoPixelEffects](https://github.com/nolanmoore/NeoPixelEffects)を組み合わせました。<br>
-稼働ハードウェアは【M5Stack Core2 for AWS】もしくは【M5Stack Core2＋M5GoBottom2】を想定しています。<br>
+robo8080さんの『stackchan-bluetooth-simple』をフォークし、FastLEDライブラリ＋[NeoPixelEffects](https://github.com/nolanmoore/NeoPixelEffects)を組み合わせました。
+また稼働ハードウェアは【M5Stack Core2 for AWS】もしくは【M5Stack Core2＋M5GoBottom2】を想定しています。<br>
 
 
-robo8080さんのソースは、タカオさん(mongonta0716)の ｽﾀｯｸﾁｬﾝ Arduinoファームウェア『stackchan-bluetooth-simple』にレベルメーターやFaceチェンジ機能を追加したものです。(稼働ハードウェアはCore2、Core2 for AWSのみ)<br>
+[robo8080](https://twitter.com/robo8080)さんのソースは、[タカオ(Takao)](https://twitter.com/mongonta555)さんの ｽﾀｯｸﾁｬﾝ Arduinoファームウェア『stackchan-bluetooth-simple』にレベルメーターやFaceチェンジ機能を追加したものです。(稼働ハードウェアはCore2、Core2 for AWSのみ)<br>
 robo8080さんが公開している現時点のソースは下記となります。<br>
 <https://github.com/robo8080/stackchan-bluetooth-simple><br>
 タカオさんオリジナルソースは下記となります。<br>
