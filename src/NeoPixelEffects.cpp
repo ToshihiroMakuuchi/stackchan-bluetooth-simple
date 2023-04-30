@@ -21,7 +21,7 @@
 
 #include <NeoPixelEffects.h>
 
-NeoPixelEffects::NeoPixelEffects(CRGB *ledset, Effect effect, int pixstart, int pixend, int aoe, unsigned long delay, CRGB color_crgb, bool repeat, bool dir) :
+NeoPixelEffects::NeoPixelEffects(CRGB *ledset, EffectType effect, int pixstart, int pixend, int aoe, unsigned long delay, CRGB color_crgb, bool repeat, bool dir) :
   _pixset(ledset), _color_fg(color_crgb), _color_bg(CRGB::Black), _repeat(repeat), _direction(dir), _counter(0)
 {
   setRange(pixstart, pixend);
@@ -33,7 +33,8 @@ NeoPixelEffects::NeoPixelEffects(CRGB *ledset, Effect effect, int pixstart, int 
 
 NeoPixelEffects::NeoPixelEffects()
 {
-  *_pixset = NULL;
+  // *_pixset = NULL;
+  *_pixset = CRGB();
   _effect = NONE;
   _status = INACTIVE;
   _pixstart = 0;
@@ -52,10 +53,11 @@ NeoPixelEffects::NeoPixelEffects()
 
 NeoPixelEffects::~NeoPixelEffects()
 {
-  *_pixset = NULL;
+  // *_pixset = NULL;
+  *_pixset = CRGB();
 }
 
-void NeoPixelEffects::setEffect(Effect effect)
+void NeoPixelEffects::setEffect(EffectType effect)
 {
   _effect = effect;
   if (_direction == FORWARD) {
@@ -574,7 +576,7 @@ void NeoPixelEffects::updateTalkingEffect()
   }
 }
 
-Effect NeoPixelEffects::getEffect()
+EffectType NeoPixelEffects::getEffect()
 {
   return _effect;
 }

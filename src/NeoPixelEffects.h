@@ -28,7 +28,7 @@
 #define FORWARD true
 #define REVERSE false
 
-enum Effect {
+enum EffectType {
   NONE,
   COMET,
   LARSON,
@@ -58,12 +58,12 @@ enum EffectStatus {
 
 class NeoPixelEffects {
   public:
-    NeoPixelEffects(CRGB *pix, Effect effect, int pixstart, int pixend, int aoe, unsigned long delay, CRGB color_crgb, bool looping, bool dir);
+    NeoPixelEffects(CRGB *pix, EffectType effect, int pixstart, int pixend, int aoe, unsigned long delay, CRGB color_crgb, bool looping, bool dir);
     NeoPixelEffects();
     ~NeoPixelEffects();
 
-    void setEffect(Effect effect);  // Sets effect
-    Effect getEffect();
+    void setEffect(EffectType effect);  // Sets effect
+    EffectType getEffect();
     void setStatus(EffectStatus status);
     EffectStatus getStatus();
     void setColor(CRGB color_crgb);
@@ -105,7 +105,7 @@ class NeoPixelEffects {
     CRGB *_pixset;          // A reference to the one created in the user code
     CRGB _color_fg;
     CRGB _color_bg;
-    Effect _effect;         // Your silly or awesome effect!
+    EffectType _effect;         // Your silly or awesome effect!
     EffectStatus _status;
     int
       _pixstart,            // First NeoPixel in range of effect
