@@ -762,6 +762,7 @@ void setup(void)
   box_balloon.setupBox(0, 160, M5.Display.width(), 80);
 
   FastLED.addLeds<NEOPIXEL,DATA_PIN>(leds, NUM_LEDS);        // FastLED関連
+  FastLED.setBrightness(15);                                 // FastLED関連 ※この値は20以上設定してはいけません！
   Serial.begin(9600);                                        // FastLED関連
 
 }
