@@ -14,6 +14,8 @@ robo8080さんの『stackchan-bluetooth-simple』をフォークし、FastLEDラ
 
 
 [robo8080](https://twitter.com/robo8080)さんのソースは、[タカオ(Takao)](https://twitter.com/mongonta555)さんの ｽﾀｯｸﾁｬﾝ Arduinoファームウェア『stackchan-bluetooth-simple』にレベルメーターやFaceチェンジ機能を追加したものです。(稼働ハードウェアはCore2、Core2 for AWSのみ)<br>
+
+
 robo8080さんが公開している現時点のソースは下記となります。<br>
 <https://github.com/robo8080/stackchan-bluetooth-simple><br>
 タカオさんオリジナルソースは下記となります。<br>
