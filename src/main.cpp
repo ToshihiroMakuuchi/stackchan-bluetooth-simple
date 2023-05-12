@@ -728,6 +728,7 @@ void setup(void)
     if (ESP_OK == nvs_open("BTSPK", NVS_READONLY, &nvs_handle)) {
       size_t volume;
       nvs_get_u32(nvs_handle, "volume", &volume);
+      M5.Speaker.setVolume(volume);
       M5.Speaker.setChannelVolume(m5spk_virtual_channel, volume);
       nvs_close(nvs_handle);
     }
@@ -878,6 +879,7 @@ void loop(void)
   if (M5.BtnB.wasPressed()) {
     uint8_t volume = M5.Speaker.getChannelVolume(m5spk_virtual_channel);
     volume = volume - 10;
+    M5.Speaker.setVolume(volume);
     M5.Speaker.setChannelVolume(m5spk_virtual_channel, volume);
     M5.Speaker.tone(2000, 100);
     delay(200);
@@ -887,6 +889,7 @@ void loop(void)
   if (M5.BtnC.wasPressed()) {
     uint8_t volume = M5.Speaker.getChannelVolume(m5spk_virtual_channel);
     volume = volume + 10;
+    M5.Speaker.setVolume(volume);
     M5.Speaker.setChannelVolume(m5spk_virtual_channel, volume);
     M5.Speaker.tone(1000, 100);
     delay(200);
