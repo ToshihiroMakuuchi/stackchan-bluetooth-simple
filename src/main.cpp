@@ -65,9 +65,9 @@ NeoPixelEffects effect = NeoPixelEffects(
   COMET,          // エフェクトの種類      effect
   0,              // エフェクト開始位置    pixstart
   9,              // エフェクト終了位置    pixend
-  3,              // 点灯する範囲(COMET等) aoe
+  3,              // 点灯範囲 (COMET等)    aoe
   50,             // エフェクトの間隔      delay_ms
-  CRGB::Green,    // 色(FastLED 指定色)    color_crgb
+  CRGB::Green,    // 色 (FastLED 指定色)   color_crgb
   true,           // ループするかどうか？  looping
   FORWARD         // エフェクトの方向      direction
 );
