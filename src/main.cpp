@@ -13,7 +13,6 @@
 #include "Stackchan_servo.h"
 #include "BluetoothA2DPSink_M5Speaker.hpp"
 #include "Avatar.h"
-#include "Avatar.h"
 #include "AtaruFace.h"
 #include "RamFace.h"
 #include "DannFace.h"
