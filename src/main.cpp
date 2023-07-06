@@ -71,41 +71,42 @@ NeoPixelEffects effect01 = NeoPixelEffects(
   FORWARD         // エフェクトの方向      direction
 );
 
-// FastLED関連の初期設定 (PORT.B)
-#define PORT_B_PIN 26
-#define PORT_B_LEDS 32
+// FastLED関連の初期設定 (PORT.B)       // Port.Bを利用したい場合は75～90行目のコメントを外してください
+// #define PORT_B_PIN 26
+// #define PORT_B_LEDS 32
+//
+// CRGB pb_leds[PORT_B_LEDS];
+//
+// NeoPixelEffects effect02 = NeoPixelEffects(
+//   pb_leds,
+//   LARSON,          // エフェクトの種類      effect
+//   0,              // エフェクト開始位置    pixstart
+//   31,              // エフェクト終了位置    pixend
+//   5,              // 点灯範囲 (COMET等)    aoe
+//   20,             // エフェクトの間隔      delay_ms
+//   CRGB::Green,    // 色 (FastLED 指定色)   color_crgb
+//   true,           // ループするかどうか？  looping
+//   FORWARD         // エフェクトの方向      direction
+// );
 
-CRGB pb_leds[PORT_B_LEDS];
+// FastLED関連の初期設定 (PORT.C)       // Port.Cを利用したい場合は93～108行目のコメントを外してください
+// #define PORT_C_PIN 14
+// #define PORT_C_LEDS 32
+//
+// CRGB pc_leds[PORT_C_LEDS];
+//
+// NeoPixelEffects effect03 = NeoPixelEffects(
+//   pc_leds,
+//   RANDOM,         // エフェクトの種類      effect
+//   0,              // エフェクト開始位置    pixstart
+//   31,              // エフェクト終了位置    pixend
+//   5,              // 点灯範囲 (COMET等)    aoe
+//   50,             // エフェクトの間隔      delay_ms
+//   CRGB::Green,    // 色 (FastLED 指定色)   color_crgb
+//   true,           // ループするかどうか？  looping
+//   FORWARD         // エフェクトの方向      direction
+// );
 
-NeoPixelEffects effect02 = NeoPixelEffects(
-  pb_leds,
-  LARSON,          // エフェクトの種類      effect
-  0,              // エフェクト開始位置    pixstart
-  31,              // エフェクト終了位置    pixend
-  5,              // 点灯範囲 (COMET等)    aoe
-  20,             // エフェクトの間隔      delay_ms
-  CRGB::Green,    // 色 (FastLED 指定色)   color_crgb
-  true,           // ループするかどうか？  looping
-  FORWARD         // エフェクトの方向      direction
-);
-
-// FastLED関連の初期設定 (PORT.C)
-#define PORT_C_PIN 14
-#define PORT_C_LEDS 32
-
-CRGB pc_leds[PORT_C_LEDS];
-
-NeoPixelEffects effect03 = NeoPixelEffects(
-  pc_leds,
-  RANDOM,         // エフェクトの種類      effect
-  0,              // エフェクト開始位置    pixstart
-  31,              // エフェクト終了位置    pixend
-  5,              // 点灯範囲 (COMET等)    aoe
-  50,             // エフェクトの間隔      delay_ms
-  CRGB::Green,    // 色 (FastLED 指定色)   color_crgb
-  true,           // ループするかどうか？  looping
-  FORWARD         // エフェクトの方向      direction
-);
 // FastLED関連の設定 end
 // エフェクト詳細はこちら:【NeoPixelEffect】 https://github.com/nolanmoore/NeoPixelEffects
 // --------------------
@@ -798,9 +799,9 @@ void setup(void)
   box_face.setupBox(280, 100, 40, 60);
   box_balloon.setupBox(0, 160, M5.Display.width(), 80);
 
-  FastLED.addLeds<NEOPIXEL,INTERNAL_PIN>(internal_leds, INTERNAL_LEDS);  // FastLED関連
-  FastLED.addLeds<NEOPIXEL,PORT_B_PIN>(pb_leds, PORT_B_LEDS);            // FastLED関連
-  FastLED.addLeds<NEOPIXEL,PORT_C_PIN>(pc_leds, PORT_C_LEDS);            // FastLED関連
+  FastLED.addLeds<NEOPIXEL,INTERNAL_PIN>(internal_leds, INTERNAL_LEDS);  // FastLED関連 (内蔵LED)
+//   FastLED.addLeds<NEOPIXEL,PORT_B_PIN>(pb_leds, PORT_B_LEDS);         // FastLED関連 (Port.B)
+//   FastLED.addLeds<NEOPIXEL,PORT_C_PIN>(pc_leds, PORT_C_LEDS);         // FastLED関連 (Port.C)
   FastLED.setBrightness(30);                                             // FastLED関連 ※この値(明るさ)は20～30程度がオススメ
   Serial.begin(9600);                                                    // FastLED関連
 
@@ -965,10 +966,10 @@ void loop(void)
   }
 #endif
 
-effect01.update();        // 内蔵LED定義の更新
-effect02.update();        // Port.B定義の更新
-effect03.update();        // Port.C定義の更新
-FastLED.show();           // FastLED初期化
+effect01.update();           // 内蔵LED定義の更新
+// effect02.update();        // Port.B定義の更新
+// effect03.update();        // Port.C定義の更新
+FastLED.show();              // FastLED初期化
 
 }
 
