@@ -3,8 +3,10 @@
 
 ---
 ## 2023年7月6日:
-Grove Port.BおよびPort.Cを用いてLEDユニットを増設しエフェクトさせるための記述を追加しました。必要な際にはsrc/main.cppの75～90行目(Port.B)、もしくは93～108行目(Port.C)のコメントアウトを外してご利用ください。<br>
-また、805行目のLEDの明るさ設定(FastLED.setBrightness)は細心の注意を払い数値設定してください。※現在の設定は30としました。<br>
+Grove Port.BおよびPort.Cを用いてLEDユニットを増設しエフェクトさせるための記述を追加しました。必要な際には[main.cpp](https://github.com/ToshihiroMakuuchi/stackchan-bluetooth-simple/blob/dev/src/main.cpp)ソース内の75～90行目(Port.B)、もしくは93～108行目(Port.C)のコメントアウトを外してご利用ください。<br>
+また、805行目のLEDの明るさ設定(FastLED.setBrightness)は細心の注意を払い数値設定してください。<br>
+※現在の設定は30としています。<br>
+<br>
 利用するLEDの仕様により意図しない発熱やM5Stack本体への負荷が高くなり故障の原因となる場合があります。<br>
 稼働ハードウェアは【M5Stack Core2 for AWS】もしくは【M5Stack Core2＋M5GoBottom2】を想定しています。
 
