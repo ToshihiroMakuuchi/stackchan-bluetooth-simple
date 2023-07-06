@@ -2,6 +2,11 @@
 
 
 ---
+## 2023年7月6日:
+Grove Port.BおよびPort.Cを用いてLEDユニットを増設しエフェクトさせるための記述を追加しました。必要な際にコメントアウトを外してご利用ください。<br>
+稼働ハードウェアは【M5Stack Core2 for AWS】もしくは【M5Stack Core2＋M5GoBottom2】を想定しています。
+
+
 ## 2023年5月12日:
 フォーク元となる[robo8080](https://twitter.com/robo8080)さんにより、音量が小さいままの問題が対策されました。そちらの修整部分を今回マージしています。
 
@@ -13,8 +18,7 @@ main.cppで1つ、NeoPixelEffectsで2つの警告メッセージが出ていた�
 
 
 ## 2023年4月22日:
-robo8080さんの『stackchan-bluetooth-simple』をフォークし、FastLEDライブラリ＋[NeoPixelEffects](https://github.com/nolanmoore/NeoPixelEffects)を組み合わせました。
-また稼働ハードウェアは【M5Stack Core2 for AWS】もしくは【M5Stack Core2＋M5GoBottom2】を想定しています。<br>
+robo8080さんの『stackchan-bluetooth-simple』をフォークし、FastLEDライブラリ＋[NeoPixelEffects](https://github.com/nolanmoore/NeoPixelEffects)を組み合わせました。<br>
 
 
 [robo8080](https://twitter.com/robo8080)さんのソースは、[タカオ(Takao)](https://twitter.com/mongonta555)さんの ｽﾀｯｸﾁｬﾝ Arduinoファームウェア『stackchan-bluetooth-simple』にレベルメーターやFaceチェンジ機能を追加したものです。(稼働ハードウェアはCore2、Core2 for AWSのみ)<br>
