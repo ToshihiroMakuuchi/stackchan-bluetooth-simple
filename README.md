@@ -4,10 +4,11 @@
 ---
 ## 2023年7月16日:
 画面中央のサーボON/OFF機能、中央右側の顔(FACE)変更機能のボタンの大きさと配置を修正しました。<br>
-<p>
-  ![変更前のレイアウト](images/button01.png)
-  ![変更後のレイアウト](images/button02.png)
-</p>
+
+| 変更前のレイアウト            | 変更後のレイアウト             |
+| ----------------------------- | ----------------------------- |
+| ![h:800](images/button01.png) | ![h:800](images/button02.png) |
+
 
 ## 2023年7月6日:
 Grove Port.BおよびPort.Cを用いてLEDユニットを増設しエフェクトさせるための記述を追加しました。必要な際には[main.cpp](https://github.com/ToshihiroMakuuchi/stackchan-bluetooth-simple/blob/dev/src/main.cpp)ソース内の75～90行目(Port.B)、もしくは93～108行目(Port.C)のコメントアウトを外してご利用ください。<br>
