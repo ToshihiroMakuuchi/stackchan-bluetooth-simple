@@ -22,7 +22,7 @@
 #include "PaletteColor.h"
 #include <nvs.h>
 #include "NeoPixelEffects.h"            // FastLED関連ライブラリ
-#include "FastLED.h"                    // FastLED
+#include <FastLED.h>                    // FastLED
 
 using namespace m5avatar;
 Avatar avatar;
@@ -795,8 +795,8 @@ void setup(void)
     avatar.setSpeechText("Normal Mode");
   }
   box_level.setupBox(0, 0, M5.Display.width(), 60);
-  box_servo.setupBox(80, 100, 80, 60);
-  box_face.setupBox(280, 100, 40, 60);
+  box_servo.setupBox(107, 80, 106, 60);
+  box_face.setupBox(260, 80, 60, 60);
   box_balloon.setupBox(0, 160, M5.Display.width(), 80);
 
   FastLED.addLeds<NEOPIXEL,INTERNAL_PIN>(internal_leds, INTERNAL_LEDS);  // FastLED関連 (内蔵LED)
@@ -903,7 +903,7 @@ void loop(void)
         avatar.setExpression(Expression::Neutral);
         avatar.setSpeechText("Normal Mode");
         avatar.draw();
-        M5.Speaker.tone(800, 100);
+        M5.Speaker.tone(1000, 100);
         a2dp_sink.stop();
         a2dp_sink.end(true);
         delay(1000);
