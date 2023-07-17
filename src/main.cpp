@@ -21,8 +21,8 @@
 #include "DoomoFace.h"
 #include "PaletteColor.h"
 #include <nvs.h>
-#include "NeoPixelEffects.h"            // FastLED関連ライブラリ
-#include <FastLED.h>                    // FastLED
+#include "NeoPixelEffects.h"            // LEDエフェクトライブラリ
+#include <FastLED.h>                    // FastLEDライブラリ
 
 using namespace m5avatar;
 Avatar avatar;
@@ -57,9 +57,11 @@ int BatteryLevel = -1;
 #define INTERNAL_PIN 25
 #define INTERNAL_LEDS 10
 
-CRGB internal_leds[INTERNAL_LEDS];
+int currentEffectIndex = 0;
 
-NeoPixelEffects effect01 = NeoPixelEffects(
+// 本体起動時のLEDエフェクト
+CRGB internal_leds[INTERNAL_LEDS];
+NeoPixelEffects effects01 = NeoPixelEffects(
   internal_leds,
   RAINBOWWAVE,    // エフェクトの種類      effect
   0,              // エフェクト開始位置    pixstart
@@ -71,44 +73,45 @@ NeoPixelEffects effect01 = NeoPixelEffects(
   FORWARD         // エフェクトの方向      direction
 );
 
-// FastLED関連の初期設定 (PORT.B)       // Port.Bを利用したい場合は75～90行目のコメントを外してください
-// #define PORT_B_PIN 26
-// #define PORT_B_LEDS 32
-//
-// CRGB pb_leds[PORT_B_LEDS];
-//
-// NeoPixelEffects effect02 = NeoPixelEffects(
-//   pb_leds,
-//   LARSON,          // エフェクトの種類      effect
-//   0,              // エフェクト開始位置    pixstart
-//   31,              // エフェクト終了位置    pixend
-//   5,              // 点灯範囲 (COMET等)    aoe
-//   20,             // エフェクトの間隔      delay_ms
-//   CRGB::Green,    // 色 (FastLED 指定色)   color_crgb
-//   true,           // ループするかどうか？  looping
-//   FORWARD         // エフェクトの方向      direction
-// );
+// FastLED関連の初期設定 (PORT.B)       // Port.Bを利用する場合は77、93行目のコメントを外してください
+/*
+#define PORT_B_PIN 26
+#define PORT_B_LEDS 32
 
-// FastLED関連の初期設定 (PORT.C)       // Port.Cを利用したい場合は93～108行目のコメントを外してください
-// #define PORT_C_PIN 14
-// #define PORT_C_LEDS 32
-//
-// CRGB pc_leds[PORT_C_LEDS];
-//
-// NeoPixelEffects effect03 = NeoPixelEffects(
-//   pc_leds,
-//   RANDOM,         // エフェクトの種類      effect
-//   0,              // エフェクト開始位置    pixstart
-//   31,              // エフェクト終了位置    pixend
-//   5,              // 点灯範囲 (COMET等)    aoe
-//   50,             // エフェクトの間隔      delay_ms
-//   CRGB::Green,    // 色 (FastLED 指定色)   color_crgb
-//   true,           // ループするかどうか？  looping
-//   FORWARD         // エフェクトの方向      direction
-// );
+CRGB pb_leds[PORT_B_LEDS];
+NeoPixelEffects effects02 = NeoPixelEffects(
+  pb_leds,
+  RAINBOWWAVE,    // エフェクトの種類      effect
+  0,              // エフェクト開始位置    pixstart
+  31,             // エフェクト終了位置    pixend
+  5,              // 点灯範囲 (COMET等)    aoe
+  20,             // エフェクトの間隔      delay_ms
+  CRGB::Green,    // 色 (FastLED 指定色)   color_crgb
+  true,           // ループするかどうか？  looping
+  FORWARD         // エフェクトの方向      direction
+);
+*/
 
+// FastLED関連の初期設定 (PORT.C)       // Port.Cを利用する場合は96、112行目のコメントを外してください
+/*
+#define PORT_C_PIN 14
+#define PORT_C_LEDS 32
+
+CRGB pc_leds[PORT_C_LEDS];
+NeoPixelEffects effects03 = NeoPixelEffects(
+  pc_leds,
+  RAINBOWWAVE,    // エフェクトの種類      effect
+  0,              // エフェクト開始位置    pixstart
+  31,             // エフェクト終了位置    pixend
+  5,              // 点灯範囲 (COMET等)    aoe
+  50,             // エフェクトの間隔      delay_ms
+  CRGB::Green,    // 色 (FastLED 指定色)   color_crgb
+  true,           // ループするかどうか？  looping
+  FORWARD         // エフェクトの方向      direction
+);
+*/
 // FastLED関連の設定 end
-// エフェクト詳細はこちら:【NeoPixelEffect】 https://github.com/nolanmoore/NeoPixelEffects
+// LEDエフェクトの詳細はこちら:【NeoPixelEffect】 https://github.com/nolanmoore/NeoPixelEffects
 // --------------------
 
 
@@ -683,6 +686,7 @@ static box_t box_level;
 static box_t box_servo;
 static box_t box_balloon;
 static box_t box_face;
+static box_t box_led;               // LEDエフェクトタップボタンの追加
 
 void displevelMeter(bool levelMeter)
 {
@@ -798,10 +802,11 @@ void setup(void)
   box_servo.setupBox(107, 80, 106, 60);
   box_face.setupBox(260, 80, 60, 60);
   box_balloon.setupBox(0, 160, M5.Display.width(), 80);
+  box_led.setupBox(0, 80, 60, 60);                                       // LEDエフェクトタップボタンの追加
 
   FastLED.addLeds<NEOPIXEL,INTERNAL_PIN>(internal_leds, INTERNAL_LEDS);  // FastLED関連 (内蔵LED)
-//   FastLED.addLeds<NEOPIXEL,PORT_B_PIN>(pb_leds, PORT_B_LEDS);         // FastLED関連 (Port.B)
-//   FastLED.addLeds<NEOPIXEL,PORT_C_PIN>(pc_leds, PORT_C_LEDS);         // FastLED関連 (Port.C)
+  // FastLED.addLeds<NEOPIXEL,PORT_B_PIN>(pb_leds, PORT_B_LEDS);         // FastLED関連 (Port.B) ※利用する場合はコメントアウトを外してください
+  // FastLED.addLeds<NEOPIXEL,PORT_C_PIN>(pc_leds, PORT_C_LEDS);         // FastLED関連 (Port.C) ※利用する場合はコメントアウトを外してください
   FastLED.setBrightness(30);                                             // FastLED関連 ※この値(明るさ)は20～30程度がオススメ
   Serial.begin(9600);                                                    // FastLED関連
 
@@ -874,6 +879,59 @@ void loop(void)
         }
         M5.Speaker.tone(1000, 100);
       }
+      if (box_led.contain(t.x, t.y))          // LEDエフェクトタップボタンの追加
+      {
+        currentEffectIndex++;
+        if (currentEffectIndex > 6) {
+          currentEffectIndex = 0;
+          }
+        effects01.stop();                     // 内蔵LEDのLEDエフェクトを停止
+        // effects02.stop();                  // Port.BのLEDエフェクトを停止 ※利用する場合はコメントアウトを外してください
+        // effects03.stop();                  // Port.CのLEDエフェクトを停止 ※利用する場合はコメントアウトを外してください
+        FastLED.clear();                      // LEDを消灯する
+        FastLED.show();                       // 変更を反映
+        delay(50);                            // タッチの連続入力を防ぐために少し待つ
+        M5.Speaker.tone(700, 100);
+
+        // エフェクトを切り替える (パラメータは64行目以降の起動時エフェクトを参考に可変してみてください)
+        switch (currentEffectIndex) {
+          case 0:
+            effects01 = NeoPixelEffects(internal_leds, COMET, 0, 9, 3, 50, CRGB::Magenta, true, FORWARD);
+            // effects02 = NeoPixelEffects(pb_leds, COMET, 0, 31, 3, 50, CRGB::Magenta, true, FORWARD); // ※利用する場合はコメントアウトを外してください
+            // effects03 = NeoPixelEffects(pc_leds, COMET, 0, 31, 3, 50, CRGB::Magenta, true, FORWARD); // ※利用する場合はコメントアウトを外してください
+            break;
+          case 1:
+            effects01 = NeoPixelEffects(internal_leds, LARSON, 0, 9, 3, 50, CRGB::Red, true, FORWARD);
+            // effects02 = NeoPixelEffects(pb_leds, LARSON, 0, 31, 3, 50, CRGB::Red, true, FORWARD); // ※利用する場合はコメントアウトを外してください
+            // effects03 = NeoPixelEffects(pc_leds, LARSON, 0, 31, 3, 50, CRGB::Red, true, FORWARD); // ※利用する場合はコメントアウトを外してください
+            break;
+          case 2:
+            effects01 = NeoPixelEffects(internal_leds, CHASE, 0, 9, 3, 50, CRGB::Blue, true, FORWARD);
+            // effects02 = NeoPixelEffects(pb_leds, CHASE, 0, 31, 3, 50, CRGB::Blue, true, FORWARD); // ※利用する場合はコメントアウトを外してください
+            // effects03 = NeoPixelEffects(pc_leds, CHASE, 0, 31, 3, 50, CRGB::Blue, true, FORWARD); // ※利用する場合はコメントアウトを外してください
+            break;
+          case 3:
+            effects01 = NeoPixelEffects(internal_leds, RAINBOWWAVE, 0, 9, 3, 50, CRGB::Green, true, FORWARD);
+            // effects02 = NeoPixelEffects(pb_leds, RAINBOWWAVE, 0, 31, 3, 50, CRGB::Green, true, FORWARD); // ※利用する場合はコメントアウトを外してください
+            // effects03 = NeoPixelEffects(pc_leds, RAINBOWWAVE, 0, 31, 3, 50, CRGB::Green, true, FORWARD); // ※利用する場合はコメントアウトを外してください
+            break;
+          case 4:
+            effects01 = NeoPixelEffects(internal_leds, STROBE, 0, 9, 3, 50, CRGB::Orange, true, FORWARD);
+            // effects02 = NeoPixelEffects(pb_leds, STROBE, 0, 31, 3, 50, CRGB::Orange, true, FORWARD); // ※利用する場合はコメントアウトを外してください
+            // effects03 = NeoPixelEffects(pc_leds, STROBE, 0, 31, 3, 50, CRGB::Orange, true, FORWARD); // ※利用する場合はコメントアウトを外してください
+            break;
+          case 5:
+            effects01 = NeoPixelEffects(internal_leds, RANDOM, 0, 9, 3, 50, CRGB::Green, true, FORWARD);
+            // effects02 = NeoPixelEffects(pb_leds, RANDOM, 0, 31, 3, 50, CRGB::Green, true, FORWARD); // ※利用する場合はコメントアウトを外してください
+            // effects03 = NeoPixelEffects(pc_leds, RANDOM, 0, 31, 3, 50, CRGB::Green, true, FORWARD); // ※利用する場合はコメントアウトを外してください
+            break;
+          case 6:
+            effects01 = NeoPixelEffects(internal_leds, TALKING, 0, 9, 3, 50, CRGB::Green, true, FORWARD);
+            // effects02 = NeoPixelEffects(pb_leds, LARSON, 0, 31, 3, 50, CRGB::Green, true, FORWARD); // ※利用する場合はコメントアウトを外してください
+            // effects03 = NeoPixelEffects(pc_leds, LARSON, 0, 31, 3, 50, CRGB::Green, true, FORWARD); // ※利用する場合はコメントアウトを外してください
+            break;
+        }
+      }
     }
   }
 
@@ -903,7 +961,7 @@ void loop(void)
         avatar.setExpression(Expression::Neutral);
         avatar.setSpeechText("Normal Mode");
         avatar.draw();
-        M5.Speaker.tone(1000, 100);
+        M5.Speaker.tone(800, 100);
         a2dp_sink.stop();
         a2dp_sink.end(true);
         delay(1000);
@@ -966,11 +1024,11 @@ void loop(void)
   }
 #endif
 
-effect01.update();           // 内蔵LED定義の更新
-// effect02.update();        // Port.B定義の更新
-// effect03.update();        // Port.C定義の更新
-FastLED.show();              // FastLED初期化
-
+effects01.update();           // 内蔵LED定義の更新
+// effects02.update();           // Port.B定義の更新 // ※利用する場合はコメントアウトを外してください
+// effects03.update();           // Port.C定義の更新 // ※利用する場合はコメントアウトを外してください
+FastLED.show();               // FastLED初期化
+delay(10);
 }
 
 #if !defined ( ARDUINO )
