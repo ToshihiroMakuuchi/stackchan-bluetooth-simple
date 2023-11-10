@@ -883,7 +883,7 @@ void loop(void)
       if (box_led.contain(t.x, t.y))          // LEDエフェクトタップボタンの追加
       {
         currentEffectIndex++;
-        if (currentEffectIndex > 6) {
+        if (currentEffectIndex > 10) {
           currentEffectIndex = 0;
           }
         effects01.stop();                     // 内蔵LEDのLEDエフェクトを停止
@@ -1025,25 +1025,25 @@ void loop(void)
     saveSettings = 0;
   }
 
-#if not(defined(ARDUINO_M5STACK_FIRE) || defined(ARDUINO_M5Stack_Core_ESP32)) // FireはAxp192ではないのとI2Cが使えないので制御できません。
-  if (M5.Power.Axp192.getACINVoltage() < 3.0f) {
-    // USBからの給電が停止したとき
-    // Serial.println("USBPowerUnPlugged.");
-    M5.Power.setLed(0);
-    if ((system_config.getAutoPowerOffTime() > 0) and (last_discharge_time == 0)) {
-      last_discharge_time = millis();
-    } else if ((system_config.getAutoPowerOffTime() > 0) 
-               and ((millis() - last_discharge_time) > system_config.getAutoPowerOffTime())) {
-      M5.Power.powerOff();
-    }
-  } else {
-    //Serial.println("USBPowerPlugged.");
-    M5.Power.setLed(80);
-    if (last_discharge_time > 0) {
-      last_discharge_time = 0;
+  if (M5.getBoard() == m5::board_t::board_M5StackCore2) {
+    if (M5.Power.Axp192.getACINVolatge() < 3.0f) {
+      // USBからの給電が停止したとき
+      // Serial.println("USBPowerUnPlugged.");
+      M5.Power.setLed(0);
+      if ((system_config.getAutoPowerOffTime() > 0) and (last_discharge_time == 0)) {
+        last_discharge_time = millis();
+      } else if ((system_config.getAutoPowerOffTime() > 0) 
+                and ((millis() - last_discharge_time) > system_config.getAutoPowerOffTime())) {
+        M5.Power.powerOff();
+      }
+    } else {
+      //Serial.println("USBPowerPlugged.");
+      M5.Power.setLed(80);
+      if (last_discharge_time > 0) {
+        last_discharge_time = 0;
+      }
     }
   }
-#endif
 
 effects01.update();           // 内蔵LED定義の更新
 // effects02.update();        // Port.B定義の更新 // ※利用する場合はコメントアウトを外してください
