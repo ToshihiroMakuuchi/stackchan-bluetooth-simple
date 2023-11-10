@@ -56,6 +56,66 @@ int BatteryLevel = -1;
 // --------------------
 
 // --------------------
+// FastLED関連の初期設定 (タカオさん版 LEDアクション)
+// タカオさん版 LEDアクションのM5GoBottom LEDを使わない場合は下記の1行(#define USE_LED)をコメントアウトしてください。
+// #define USE_LED
+
+#ifdef USE_LED
+  #include <FastLED.h>
+  #define NUM_LEDS 10
+#ifdef ARDUINO_M5STACK_FIRE
+  #define LED_PIN 15
+#else
+  #define LED_PIN 25
+#endif
+  CRGB leds[NUM_LEDS];
+  #ifdef USE_LED_OUT
+  CRGB leds_out[NUM_LED_OUT];
+  #endif
+
+  CHSV red (0, 255, 255);
+  CHSV green (95, 255, 255);
+  CHSV blue (160, 255, 255);
+  CHSV magenta (210, 255, 255);
+  CHSV yellow (45, 255, 255);
+  CHSV hsv_table[5] = { blue, green, yellow, magenta, red };
+  CHSV hsv_table_out[5] = { blue, green, yellow, magenta, red }; //red, magenta, yellow, green, blue };
+
+  void turn_off_led() {
+    // Now turn the LED off, then pause
+    for(int i=0;i<NUM_LEDS;i++) leds[i] = CRGB::Black;
+    FastLED.show();  
+  }
+
+  void clear_led_buff() {
+    // Now turn the LED off, then pause
+    for(int i=0;i<NUM_LEDS;i++) leds[i] =  CRGB::Black;
+  }
+
+  void level_led(int level1, int level2) {  
+  if(level1 > 5) level1 = 5;
+  if(level2 > 5) level2 = 5;
+
+    clear_led_buff(); 
+    for(int i=0;i<level1;i++){
+      fill_gradient(leds, 0, hsv_table[i], 4, hsv_table[0] );
+      #ifdef USE_LED_OUT
+      fill_gradient(leds_out, 0, hsv_table_out[0], 18, hsv_table_out[i] );
+      #endif
+    }
+    for(int i=0;i<level2;i++){
+      fill_gradient(leds, 5, hsv_table[0], 9, hsv_table[i] );
+      #ifdef USE_LED_OUT
+      fill_gradient(leds_out, 19, hsv_table_out[i], 36, hsv_table_out[0] );
+      #endif
+    }
+    FastLED.show();
+  }
+#endif
+// FastLED関連の設定 end
+// --------------------
+
+// --------------------
 // FastLED関連の初期設定 (内蔵LED)
 #define INTERNAL_PIN 25
 #define INTERNAL_LEDS 10
@@ -457,6 +517,8 @@ bool levelMeter = true;
 bool balloon = false;
 
 void servoLoop(void *args) {
+  DriveContext *ctx = (DriveContext *)args;
+  Avatar *avatar = ctx->getAvatar();
   long move_time = 0;
   long interval_time = 0;
   long move_x = 0;
@@ -464,7 +526,7 @@ void servoLoop(void *args) {
   float gaze_x = 0.0f;
   float gaze_y = 0.0f;
   bool sing_mode = false;
-  for (;;) {
+  while (avatar->isDrawing()) {
     if(!servo_home)
     {
 
@@ -485,7 +547,7 @@ void servoLoop(void *args) {
                        , system_config.getServoInterval(AvatarMode::SINGING)->move_max);
       sing_mode = true;
     } 
-    avatar.getGaze(&gaze_y, &gaze_x);
+    avatar->getGaze(&gaze_y, &gaze_x);
 //    avatar.setRotation(gaze_x * 5);
     
 //    Serial.printf("x:%f:y:%f\n", gaze_x, gaze_y);
@@ -505,14 +567,14 @@ void servoLoop(void *args) {
     if (!bluetooth_mode) {
       int lyric_no = random(system_config.getLyrics_num());
       int exp2 = random(2);
-      avatar.setMouthOpenRatio(1.0f);
-      avatar.setSpeechText((const char*)system_config.getLyric(lyric_no)->c_str());
+      avatar->setMouthOpenRatio(1.0f);
+      avatar->setSpeechText((const char*)system_config.getLyric(lyric_no)->c_str());
       if (exp2 % 2) {
-        avatar.setExpression(Expression::Neutral);
+        avatar->setExpression(Expression::Neutral);
       } else {
-        avatar.setExpression(Expression::Happy);
+        avatar->setExpression(Expression::Happy);
       }
-      avatar.setMouthOpenRatio(0.5f);
+      avatar->setMouthOpenRatio(0.5f);
     }
     //avatar.setExpression((Expression)exp);
     if (sing_mode && !servo_home) {
@@ -524,8 +586,8 @@ void servoLoop(void *args) {
     //   servo.moveXY(START_DEGREE_VALUE_X, START_DEGREE_VALUE_Y, 500);
     // }
     vTaskDelay(interval_time/portTICK_PERIOD_MS);
-
   }
+  vTaskDelete(NULL);
 }
 
 static fft_t fft1;
@@ -535,11 +597,27 @@ void lipSync(void *args)
 {
   DriveContext *ctx = (DriveContext *)args;
   Avatar *avatar = ctx->getAvatar();
-  for (;;)
+  while (avatar->isDrawing())
   {
     uint64_t level = 0;
     auto buf = a2dp_sink.getBuffer();
     if (buf) {
+#ifdef USE_LED
+      // buf[0]: LEFT
+      // buf[1]: RIGHT
+      switch(system_config.getLedLR()) {
+        case 1: // Left Only
+          level_led(abs(buf[0])*10/INT16_MAX,abs(buf[0])*10/INT16_MAX);
+          break;
+        case 2: // Right Only
+          level_led(abs(buf[1])*10/INT16_MAX,abs(buf[1])*10/INT16_MAX);
+          break;
+        default: // Stereo
+          level_led(abs(buf[1])*10/INT16_MAX,abs(buf[0])*10/INT16_MAX);
+          break;
+      }
+#endif
+
       memcpy(raw_data1, buf, WAVE_SIZE * 2 * sizeof(int16_t));
       fft1.exec(raw_data1);
       for (size_t bx = 5; bx <= 60; ++bx) { // リップシンクで抽出する範囲はここで指定(低音)0〜64（高音）
@@ -562,6 +640,7 @@ void lipSync(void *args)
     avatar->setMouthOpenRatio(mouth_ratio);
     vTaskDelay(30/portTICK_PERIOD_MS);
   }
+  vTaskDelete(NULL);
 }
 
 void hvt_event_callback(int avatar_expression, const char* text) {
@@ -579,6 +658,15 @@ void avrc_metadata_callback(uint8_t data1, const uint8_t *data2)
   }
   sing_happy = !sing_happy;
 
+}
+
+void avatarStart() {
+  avatar.start();  
+  avatar.addTask(lipSync, "lipSync");
+  avatar.addTask(servoLoop, "servoLoop");
+}
+void avatarStop() {
+  avatar.stop();  
 }
 
 Face* faces[8];
@@ -715,8 +803,8 @@ void displevelMeter(bool levelMeter)
 void setup(void)
 {
   auto cfg = M5.config();
-  cfg.output_power = false;
-  cfg.external_spk = true;    /// use external speaker (SPK HAT / ATOMIC SPK)
+  cfg.output_power = true;
+//cfg.external_spk = true;    /// use external speaker (SPK HAT / ATOMIC SPK)
 //cfg.external_spk_detail.omit_atomic_spk = true; // exclude ATOMIC SPK
 //cfg.external_spk_detail.omit_spk_hat    = true; // exclude SPK HAT
 
@@ -787,8 +875,10 @@ void setup(void)
   Avatar_setup(!bluetooth_mode);
 
   // タカオさん Jul 3 2023 Libraries VersionUP ※setBatteryIconがいない
+  // avatar.init(1); // start drawing
   // avatar.setBatteryIcon(true);
-  last_powericon_millis = millis();
+  // avatar.setBatteryStatus(M5.Power.isCharging(), M5.Power.getBatteryLevel());
+  // last_powericon_millis = millis();
   
   // avatar.addTask(lipSync, "lipSync");
   avatar.addTask(servoLoop, "servoLoop");
@@ -812,6 +902,14 @@ void setup(void)
   box_balloon.setupBox(0, 160, M5.Display.width(), 80);
   box_led.setupBox(0, 80, 60, 60);                                       // LEDエフェクトタップボタンの追加
 
+#ifdef USE_LED
+  FastLED.addLeds<SK6812, LED_PIN, GRB>(leds, NUM_LEDS);  // GRB ordering is typical
+  FastLED.setBrightness(32);
+  level_led(5, 5);
+  delay(1000);
+  turn_off_led();
+#endif
+
   FastLED.addLeds<NEOPIXEL,INTERNAL_PIN>(internal_leds, INTERNAL_LEDS);  // FastLED関連 (内蔵LED)
   // FastLED.addLeds<NEOPIXEL,PORT_B_PIN>(pb_leds, PORT_B_LEDS);         // FastLED関連 (Port.B) ※利用する場合はコメントアウトを外してください
   // FastLED.addLeds<NEOPIXEL,PORT_C_PIN>(pc_leds, PORT_C_LEDS);         // FastLED関連 (Port.C) ※利用する場合はコメントアウトを外してください
@@ -827,15 +925,6 @@ void loop(void)
   avatar.draw();
   if(!levelMeter && balloon && bluetooth_mode)   avatar.setSpeechText(a2dp_sink.getMetaData(0, false));
 
-  {
-    static int prev_frame;
-    int frame;
-    do
-    {
-      vTaskDelay(1);
-    } while (prev_frame == (frame = millis() >> 3)); /// 8 msec cycle wait
-    prev_frame = frame;
-  }
   static int lastms = 0;
   if (millis()-lastms > 1000) {
     lastms = millis();
@@ -1032,6 +1121,7 @@ void loop(void)
     saveSettings = 0;
   }
 
+#ifndef ARDUINO_M5Stack_Core_ESP32
   if (M5.getBoard() == m5::board_t::board_M5StackCore2) {
     if (M5.Power.Axp192.getACINVoltage() < 3.0f) {
       // USBからの給電が停止したとき
@@ -1051,8 +1141,10 @@ void loop(void)
       }
     }
   }
+#endif
+  // 
   // タカオさん Jul 3 2023 Libraries VersionUP ※setBatteryStatusがいない
-  // if ((last_powericon_millis - millis())> powericon_interval) {
+  // if ((millis() - last_powericon_millis)> powericon_interval) {
   //   avatar.setBatteryStatus(M5.Power.isCharging(), M5.Power.getBatteryLevel());
   //   last_powericon_millis = millis();
   // }
