@@ -44,9 +44,9 @@ enum EffectType {
   RANDOM,
   TALKING,
   TRIWAVE,
-  // INVERSELARSON,	// Not currently implemented
-  // FIREWORK,	// Not currently implemented
-  // SPARKLEFILL,	// Not currently implemented
+  FADEINOUT,                //2023-11-08 追加
+  FIRE,                     //2023-11-08 追加
+  NANAIRO,                  //2023-11-08 追加
   NUM_EFFECT
 };
 
@@ -75,12 +75,17 @@ class NeoPixelEffects {
     void setRepeat(bool repeat);
     void setDirection(bool direction);
 
+    void setAll(byte red, byte green, byte blue);         // 2023-11-08 追加
+    void showStrip();                                     // 2023-11-08 追加
+
     void update(); // Process effect
     void stop();
     void pause();
     void play();
 
     void clear();
+    void clearRange(int start, int end);                  // 2023-11-08 追加
+	
     void fill_solid(CRGB color_crgb);
     void fill_gradient(CRGB color_crgb1, CRGB color_crgb2);
 
@@ -97,10 +102,9 @@ class NeoPixelEffects {
     void updateStrobeEffect();
     void updateWaveEffect(int subtype);
     void updateTalkingEffect();
-    // void initTalkingEffect();
-    // void initTalkingEffect1(uint8_t &brightness_array, uint16_t &delay_array, uint8_t &maxb, uint8_t &minb, uint8_t &current_b);
-    // void updateFireworkEffect();
-    // void updateSparkleFillEffect();
+    void updateFadeInOutEffect();  // 2023-11-08 追加
+    void updateFireEffect();       // 2023-11-08 追加
+    void updateNanairoEffect();    // 2023-11-08 追加
 
     CRGB *_pixset;          // A reference to the one created in the user code
     CRGB _color_fg;
@@ -108,6 +112,7 @@ class NeoPixelEffects {
     EffectType _effect;         // Your silly or awesome effect!
     EffectStatus _status;
     int
+      fadeValue,            // フェードの値を追跡する   // 2023-11-08 追加
       _pixstart,            // First NeoPixel in range of effect
       _pixend,              // Last NeoPixel in range of effect
       _pixrange,            // Length of effect area
@@ -116,6 +121,7 @@ class NeoPixelEffects {
       _counter;
     uint8_t _subtype;          // Defines sub type to be used
     bool
+      effectFinished,       // エフェクトが完了したかどうかを追跡する
       _repeat,              // Whether or not the effect loops in area
       _direction;           // Whether or not the effect moves from start to end pixel
     unsigned long

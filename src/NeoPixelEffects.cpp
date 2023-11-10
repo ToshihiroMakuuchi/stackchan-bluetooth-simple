@@ -49,6 +49,8 @@ NeoPixelEffects::NeoPixelEffects()
   _color_bg = CRGB::Black;
   _repeat = true;
   _direction = FORWARD;
+  fadeValue = 0;                 // 2023-11-08 追加
+  effectFinished = true;         // 2023-11-08 追加
 }
 
 NeoPixelEffects::~NeoPixelEffects()
@@ -123,12 +125,15 @@ void NeoPixelEffects::update()
         case TALKING:
           updateTalkingEffect();
           break;
-        // case FIREWORK:
-        //   updateFireworkEffect();
-        //   break;
-        // case SPARKLEFILL:
-        //   updateSparkleFillEffect();
-        //   break;
+        case FADEINOUT:                   // 2023-11-08 追加
+          updateFadeInOutEffect();        // 2023-11-08 追加
+          break;                          // 2023-11-08 追加
+        case FIRE:                        // 2023-11-08 追加
+          updateFireEffect();             // 2023-11-08 追加
+          break;                          // 2023-11-08 追加
+        case NANAIRO:                     // 2023-11-08 追加
+          updateNanairoEffect();          // 2023-11-08 追加
+          break;                          // 2023-11-08 追加
         default:
           break;
       }
@@ -357,61 +362,6 @@ void NeoPixelEffects::updatePulseEffect()
   }
 }
 
-// void NeoPixelEffects::updateFireworkEffect()
-// {
-//   static NeoPixelEffects *m = new NeoPixelEffects(_pixset, COMET, _pixstart,                  _pixend - _pixaoe - 4, 2,         25,     CRGB::White,  false, FORWARD);
-//   static NeoPixelEffects *s1 = new NeoPixelEffects(_pixset, NONE, _pixend - 2 * _pixaoe - 4,  _pixend - _pixaoe - 2, stars_aoe, _delay, _color_fg, false, REVERSE);
-//   static NeoPixelEffects *s2 = new NeoPixelEffects(_pixset, NONE, _pixend - _pixaoe - 2,      stars_end,             stars_aoe, _delay, _color_fg, false, FORWARD);
-//   static NeoPixelEffects *sf = new NeoPixelEffects(_pixset, NONE, _pixend - 2 * _pixaoe - 4,  _pixend,               1,         7,      _color_fg, false, REVERSE);
-//
-//   if (_counter == 0 && m->getEffect() == NONE) {
-//     delay(200);
-//     s1->setEffect(FILLIN);
-//     s2->setEffect(FILLIN);
-//     _counter = 1;
-//   } else if (_counter == 1 && s1->getEffect() == NONE && s2->getEffect() == NONE) {
-//     delay(200);
-//     sf->setEffect(FADE);
-//     _counter = 2;
-//   } else if (_counter == 2 && sf->getEffect() == NONE) {
-//     delete(m);
-//     delete(s1);
-//     delete(s2);
-//     delete(sf);
-//     setEffect(NONE);
-//   }
-//
-//   m->update();
-//   s1->update();
-//   s2->update();
-//   sf->update();
-// }
-
-// void NeoPixelEffects::updateSparkleFillEffect()
-// {
-//   static NeoPixelEffects *sparkles = new NeoPixelEffects(_pixset, STATIC, (_direction==FORWARD)?_pixstart,  (_direction==FORWARD)?_pixstart:_pixend, 1, _delay, _color_fg, false, _direction);
-//
-//   sparkles->update();
-//
-//   if (_direction == FORWARD) {
-//     if (_pixcurrent != _pixend) {
-//       _pixcurrent++;
-//       sparkles->setRange(_pixstart, _pixcurrent);
-//     }
-//   } else {
-//     if (_pixcurrent != _pixstart) {
-//       _pixcurrent--;
-//       sparkles->setRange(_pixcurrent, _pixend);
-//     }
-//   }
-//
-//   if (_status == INACTIVE) {
-//     delete(sparkles);
-//     clear();
-//     setEffect(NONE);
-//   }
-// }
-
 void NeoPixelEffects::updateRainbowWaveEffect()
 {
   float ratio = 255.0  / _pixrange;
@@ -438,75 +388,6 @@ void NeoPixelEffects::updateWaveEffect(int subtype)
   }
   _counter = (_direction) ? _counter + 2 : _counter - 2;
 }
-
-// void NeoPixelEffects::updateTalkingEffectV2()
-// {
-//   static uint8_t init = 1;
-//   static uint8_t next_bright = 0;
-//   static uint16_t next_delay = 0;
-//   static unsigned long lastupdate = 0;
-//   static uint8_t max_b = 0;
-//   static uint8_t min_b = 0;
-//   static uint8_t current_b = 0;
-//   static int delta_b = 0;
-//
-//   if (init) {
-//     initTalkingEffect(next_bright, next_delay, max_b, min_b, current_b);
-//     init = 0;
-//   }
-//
-//   unsigned long now = millis();
-//
-//   if (now - lastupdate > next_delay) {
-//     // Updater delay and brightness
-//     lastupdate = now;
-//     next_delay = random16(100, 250);
-//     next_bright = random8(min_b + 50, max_b);
-//
-//     // Even if we are currently moving down slope, make sure next brightness is higher
-//     while (next_bright - current_b <= 0) {
-//       next_bright = random8(min_b + 50, max_b);
-//     }
-//     delta_b = next_bright - current_b;
-//   }
-//
-//   if (delta_b > 0) {
-//     if (_direction == FORWARD) {
-//       current_b++;
-//       delta_b = next_bright - current_b;
-//     } else {
-//       current_b--;
-//       delta_b = current_b - min_b;
-//     }
-//   } else {
-//     if (current_b == next_bright) {
-//       _direction = REVERSE;
-//       delta_b = current_b - min_b;
-//     } else {
-//       _direction = FORWARD;
-//     }
-//   }
-//
-//   // Set colors
-//   float ratio = current_b / 255.0;
-//   CRGB pulsecolor = CRGB(_color_fg.r * ratio, _color_fg.g * ratio, _color_fg.b * ratio);
-//   for (int i = _pixstart; i <= _pixend; i++) {
-//     _pixset[i] = pulsecolor;
-//   }
-// }
-//
-// void NeoPixelEffects::initTalkingEffectV2(uint8_t &bright, uint16_t &delay, uint8_t &maxb, uint8_t &minb, uint8_t &nowb)
-// {
-//   maxb = max(_color_fg.r, max(_color_fg.g, _color_fg.b));
-//   minb = _color_bg.r;
-//   nowb = minb;
-//   _direction = FORWARD;
-//   _delay = 0;
-//   _color_bg = CRGB(30, 0, 0);
-//
-//   bright = random8(minb + 50, maxb);
-//   delay = random16(100, 250);
-// }
 
 void NeoPixelEffects::updateTalkingEffect()
 {
@@ -548,8 +429,11 @@ void NeoPixelEffects::updateTalkingEffect()
       }
     }
   }
+  
+  // clear();
+  // clear() の代わりに、TALKING エフェクトの範囲だけをクリアします。
+  clearRange(_pixstart, _pixend);           // 2023-11-08 clear()からの差替
 
-  clear();
   if (_counter != 0) {
     if (_pixrange % 2 != 0) {
       _pixset[_pixstart + _pixrange / 2] = _color_fg;
@@ -575,6 +459,134 @@ void NeoPixelEffects::updateTalkingEffect()
     }
   }
 }
+
+// ---------------------------- // 2023-11-08 追加
+// フェードのスピードを調整する変数
+int fadeIncrement = 5; // スピードを遅くするにはこの値を小さく、速くするには大きくします。
+
+void NeoPixelEffects::updateFadeInOutEffect() {
+    if (effectFinished) { // If the effect is finished then reset
+        fadeValue = 0;
+        effectFinished = false;
+    }
+
+    // Fade in
+    if (fadeValue < 255) {
+        float r = (fadeValue / 255.0) * _color_fg.r;
+        float g = (fadeValue / 255.0) * _color_fg.g;
+        float b = (fadeValue / 255.0) * _color_fg.b;
+        setAll(r, g, b); // Set LED values
+        showStrip();
+        fadeValue += fadeIncrement; // Increment fade value
+        return; // Return to exit the function
+    }
+
+    // Fade out
+    if (fadeValue >= 255) {
+        int newFadeValue = 510 - fadeValue; // Subtract from 255 to 0
+        if (newFadeValue < 0) { // If the effect is finished
+            effectFinished = true;
+            return;
+        }
+        float r = (newFadeValue / 255.0) * _color_fg.r;
+        float g = (newFadeValue / 255.0) * _color_fg.g;
+        float b = (newFadeValue / 255.0) * _color_fg.b;
+        setAll(r, g, b); // Set LED values
+        showStrip();
+        fadeValue += fadeIncrement; // Increment fade value
+        return; // Return to exit the function
+    }
+}
+
+void NeoPixelEffects::updateFireEffect() {
+  // エフェクトがアクティブでない場合は何もしない
+  if (_status != ACTIVE) return;
+
+  // 火のエフェクト用のバッファを初期化
+  static byte heat[256];
+
+  // 炎を下から上に移動させる
+  for (int i = _pixend; i >= _pixstart; i--) {
+    // 炎のランダムなクロールをシミュレート
+    heat[i] = qsub8(heat[i + 1], random8(0, ((_pixaoe * 10) / _pixrange) + 2));
+  }
+
+  // ピクセルに熱を加える
+  for (int i = _pixstart; i < _pixend; i++) {
+    heat[i] = qadd8(heat[i], random8(160, 255));
+  }
+
+  // 熱をもとにピクセルの色を設定する
+  for (int i = _pixstart; i < _pixend; i++) {
+    // 熱を色に変換する
+    CRGB color = HeatColor(heat[i]);
+
+    // ここで色をカスタマイズする
+    color.red = qadd8(color.red, 200);      // 赤色成分を強くする
+    color.green = qsub8(color.green, 50);  // 緑色と青色成分を減少させる（炎の色をより赤くする）
+    color.blue = qsub8(color.blue, 50);    // 緑色と青色成分を減少させる（炎の色をより赤くする）
+
+    // 明るさの減衰をシミュレート
+    color.nscale8_video(random8(140, 255));
+
+    // ピクセルを設定
+    _pixset[i] = color;
+  }
+
+  // ストリップを表示
+  showStrip();
+}
+
+void NeoPixelEffects::updateNanairoEffect() {
+    static int colorIndex = 0; // 現在の色のインデックス
+    static CRGB colors[] = {
+        CRGB::Red,
+        CRGB::Orange,
+        CRGB::Yellow,
+        CRGB::Green,
+        CRGB::Blue,
+        CRGB::Indigo,
+        CRGB::Violet
+    }; // 七色の配列
+
+    // エフェクトが完了していれば初期化
+    if (effectFinished) {
+        fadeValue = 0;
+        effectFinished = false;
+        // 次の色に移動
+        colorIndex = (colorIndex + 1) % (sizeof(colors) / sizeof(colors[0]));
+        _color_fg = colors[colorIndex]; // 次の色を設定
+    }
+
+    // フェードイン
+    if (fadeValue < 255) {
+        float r = (fadeValue / 255.0) * _color_fg.r;
+        float g = (fadeValue / 255.0) * _color_fg.g;
+        float b = (fadeValue / 255.0) * _color_fg.b;
+        setAll(r, g, b); // 計算した値でLEDを設定
+        showStrip();
+        fadeValue += 5; // フェード速度を調整
+        return; // このステップで制御を戻す
+    }
+
+    // フェードアウト
+    if (fadeValue >= 255) {
+        int newFadeValue = 510 - fadeValue; // 255から0まで減算
+        if (newFadeValue < 0) { // エフェクトが完了
+            effectFinished = true;
+            return;
+        }
+        float r = (newFadeValue / 255.0) * _color_fg.r;
+        float g = (newFadeValue / 255.0) * _color_fg.g;
+        float b = (newFadeValue / 255.0) * _color_fg.b;
+        setAll(r, g, b); // 計算した値でLEDを設定
+        showStrip();
+        fadeValue += 5; // フェード速度を調整
+        return; // このステップで制御を戻す
+    }
+}
+// ---------------------------- // 2023-11-08 追加
+
 
 EffectType NeoPixelEffects::getEffect()
 {
@@ -682,6 +694,16 @@ void NeoPixelEffects::clear()
   fill_solid(CRGB::Black);
 }
 
+// ---------------------------- // 2023-11-08 追加
+// この関数は特定の範囲のLEDをクリアします。
+void NeoPixelEffects::clearRange(int start, int end)
+{
+    for (int i = start; i <= end; i++) {
+        _pixset[i] = CRGB::Black;
+    }
+}
+// ---------------------------- // 2023-11-08 追加
+
 void NeoPixelEffects::fill_solid(CRGB color_crgb)
 {
   for (int i = _pixstart; i <= _pixend; i++) {
@@ -703,3 +725,15 @@ void NeoPixelEffects::fill_gradient(CRGB color_crgb1, CRGB color_crgb2)
     _pixset[i] = CRGB(grad_red, grad_green, grad_blue);
   }
 }
+
+// ---------------------------- // 2023-11-08 追加
+void NeoPixelEffects::setAll(byte red, byte green, byte blue) {
+    for(int i = _pixstart; i <= _pixend; i++) {
+        _pixset[i] = CRGB(red, green, blue);
+    }
+}
+
+void NeoPixelEffects::showStrip() {
+    FastLED.show();
+}
+// ---------------------------- // 2023-11-08 追加
