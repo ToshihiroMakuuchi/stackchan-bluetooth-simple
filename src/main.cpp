@@ -749,10 +749,10 @@ void setup(void)
   bluetooth_mode = system_config.getBluetoothSetting()->starting_state;
   Serial.printf("Bluetooth_mode:%s\n", bluetooth_mode ? "true" : "false");
   
-  servo.begin(system_config.getServoInfo()->servo_pin_x, START_DEGREE_VALUE_X,
-              system_config.getServoInfo()->servo_offset_x,
-              system_config.getServoInfo()->servo_pin_y, START_DEGREE_VALUE_Y,
-              system_config.getServoInfo()->servo_offset_y);
+  servo.begin(system_config.getServoInfo(AXIS_X)->pin, START_DEGREE_VALUE_X,
+              system_config.getServoInfo(AXIS_X)->offset,
+              system_config.getServoInfo(AXIS_Y)->pin, START_DEGREE_VALUE_Y,
+              system_config.getServoInfo(AXIS_Y)->offset);
   delay(2000);
 
   {
@@ -947,7 +947,7 @@ void loop(void)
          // effects03 = NeoPixelEffects(pc_leds, NONE, 0, 59, 3, 50, CRGB::Green, true, FORWARD);        // ※利用する場合はコメントアウトを外してください
             break;
           case 10:
-            effects01 = NeoPixelEffects(internal_leds, SINEWAVE, 0, 9, 3, 50, CRGB::Green, true, FORWARD);
+            effects01 = NeoPixelEffects(internal_leds, SINEWAVE, 0, 9, 3, 5, CRGB::Green, true, FORWARD);
          // effects02 = NeoPixelEffects(pb_leds, PULSE, 0, 59, 8, 10, CRGB::DarkMagenta, true, FORWARD); // ※利用する場合はコメントアウトを外してください
          // effects03 = NeoPixelEffects(pc_leds, PULSE, 0, 59, 8, 10, CRGB::Red, true, REVERSE);         // ※利用する場合はコメントアウトを外してください
             break;
@@ -1026,7 +1026,7 @@ void loop(void)
   }
 
   if (M5.getBoard() == m5::board_t::board_M5StackCore2) {
-    if (M5.Power.Axp192.getACINVolatge() < 3.0f) {
+    if (M5.Power.Axp192.getACINVoltage() < 3.0f) {
       // USBからの給電が停止したとき
       // Serial.println("USBPowerUnPlugged.");
       M5.Power.setLed(0);
