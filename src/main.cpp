@@ -937,17 +937,17 @@ void loop(void)
          // effects03 = NeoPixelEffects(pc_leds, NANAIRO, 0, 59, 3, 10, CRGB::Red, true, FORWARD);       // ※利用する場合はコメントアウトを外してください
             break;          
           case 8:
-            effects01 = NeoPixelEffects(internal_leds, FIRE, 0, 9, 3, 50, CRGB::Red, true, FORWARD);
+            effects01 = NeoPixelEffects(internal_leds, NONE, 0, 9, 3, 50, CRGB::Red, true, FORWARD);
          // effects02 = NeoPixelEffects(pb_leds, FIRE, 0, 59, 8, 5, CRGB::Red, true, FORWARD);           // ※利用する場合はコメントアウトを外してください
          // effects03 = NeoPixelEffects(pc_leds, FIRE, 0, 59, 8, 5, CRGB::Red, true, FORWARD);           // ※利用する場合はコメントアウトを外してください
             break;
           case 9:
-            effects01 = NeoPixelEffects(internal_leds, NONE, 0, 9, 3, 50, CRGB::Green, true, FORWARD);   // あえてここで消灯を入れます (9タップ目)
+            effects01 = NeoPixelEffects(internal_leds, FIRE, 0, 9, 3, 50, CRGB::Green, true, FORWARD);   // あえてここで消灯を入れます (9タップ目)
          // effects02 = NeoPixelEffects(pb_leds, NONE, 0, 59, 3, 50, CRGB::Green, true, FORWARD);        // ※利用する場合はコメントアウトを外してください
          // effects03 = NeoPixelEffects(pc_leds, NONE, 0, 59, 3, 50, CRGB::Green, true, FORWARD);        // ※利用する場合はコメントアウトを外してください
             break;
           case 10:
-            effects01 = NeoPixelEffects(internal_leds, TALKING, 0, 9, 6, 50, CRGB::Green, true, FORWARD);
+            effects01 = NeoPixelEffects(internal_leds, SINEWAVE, 0, 9, 3, 50, CRGB::Green, true, FORWARD);
          // effects02 = NeoPixelEffects(pb_leds, PULSE, 0, 59, 8, 10, CRGB::DarkMagenta, true, FORWARD); // ※利用する場合はコメントアウトを外してください
          // effects03 = NeoPixelEffects(pc_leds, PULSE, 0, 59, 8, 10, CRGB::Red, true, REVERSE);         // ※利用する場合はコメントアウトを外してください
             break;
