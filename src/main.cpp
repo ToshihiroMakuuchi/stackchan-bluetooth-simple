@@ -40,6 +40,9 @@ fs::FS json_fs = SD; // JSONファイルの収納場所(SPIFFS or SD)
 StackchanSystemConfig system_config;
 const char* stackchan_system_config_yaml = "/yaml/SC_Config.yaml";
 
+const unsigned long powericon_interval = 30000;  // バッテリーアイコンを更新する間隔(msec)
+unsigned long last_powericon_millis = 0;
+
 bool bluetooth_mode = false; 
 
 // --------------------
@@ -712,7 +715,7 @@ void displevelMeter(bool levelMeter)
 void setup(void)
 {
   auto cfg = M5.config();
-
+  cfg.output_power = false;
   cfg.external_spk = true;    /// use external speaker (SPK HAT / ATOMIC SPK)
 //cfg.external_spk_detail.omit_atomic_spk = true; // exclude ATOMIC SPK
 //cfg.external_spk_detail.omit_spk_hat    = true; // exclude SPK HAT
@@ -783,6 +786,10 @@ void setup(void)
   }
   Avatar_setup(!bluetooth_mode);
 
+  // タカオさん Jul 3 2023 Libraries VersionUP ※setBatteryIconがいない
+  // avatar.setBatteryIcon(true);
+  last_powericon_millis = millis();
+  
   // avatar.addTask(lipSync, "lipSync");
   avatar.addTask(servoLoop, "servoLoop");
   avatar.setExpression(Expression::Neutral);
@@ -1044,6 +1051,11 @@ void loop(void)
       }
     }
   }
+  // タカオさん Jul 3 2023 Libraries VersionUP ※setBatteryStatusがいない
+  // if ((last_powericon_millis - millis())> powericon_interval) {
+  //   avatar.setBatteryStatus(M5.Power.isCharging(), M5.Power.getBatteryLevel());
+  //   last_powericon_millis = millis();
+  // }
 
 effects01.update();           // 内蔵LED定義の更新
 // effects02.update();        // Port.B定義の更新 // ※利用する場合はコメントアウトを外してください
