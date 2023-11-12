@@ -53,6 +53,7 @@ static float lipsync_level_max = LIPSYNC_LEVEL_MAX; // リップシンクの上�
 float mouth_ratio = 0.0f;
 bool sing_happy = true;
 int BatteryLevel = -1;
+// ColorPalette *cps;     // タカオさん Aug 9 2023 Add ColorPalette Code コメントで追加 (Collorpaletteは顔変更で他で利用中)
 // Avatar関連の設定 end
 // --------------------
 
@@ -65,8 +66,10 @@ int BatteryLevel = -1;
   #include <FastLED.h>
   #define NUM_LEDS 10
 #if defined(ARDUINO_M5STACK_FIRE) || defined(ARDUINO_M5Stack_Core_ESP32)
+  // M5Core1 + M5GoBottom1の組み合わせ
   #define LED_PIN 15
 #else
+  // M5Core2 + M5GoBottom2の組み合わせ
   #define LED_PIN 25
 #endif
   CRGB leds[NUM_LEDS];
@@ -818,19 +821,32 @@ void setup(void)
   { /// custom setting
     auto spk_cfg = M5.Speaker.config();
     /// Increasing the sample_rate will improve the sound quality instead of increasing the CPU load.
-    spk_cfg.sample_rate = 64000; // default:64000 (64kHz)  e.g. 48000 , 50000 , 80000 , 96000 , 100000 , 128000 , 144000 , 192000 , 200000
+#ifdef ARDUINO_M5tack_Core_ESP32
+    // M5Stack Fire/Core2/AWS 向けPSRAM搭載機種のパラメータ
+    spk_cfg.sample_rate = 96000; // default:64000 (64kHz)  e.g. 48000 , 50000 , 80000 , 96000 , 100000 , 128000 , 144000 , 192000 , 200000
     spk_cfg.task_pinned_core = APP_CPU_NUM;
     // spk_cfg.task_priority = configMAX_PRIORITIES - 2;
     spk_cfg.dma_buf_count = 20;
     //spk_cfg.stereo = true;
     spk_cfg.dma_buf_len = 256;
+#else
+    // M5Stack Basic/Gray/Goのパラメータ
+    // 音が途切れる場合はdma_buf_countとdma_buf_lenを増やすと改善できる場合あり。
+    // 顔が表示されなかったり、点滅するようであれば増やし過ぎなので減らしてください。
+    spk_cfg.sample_rate = 64000; // default:64000 (64kHz)  e.g. 48000 , 50000 , 80000 , 96000 , 100000 , 128000 , 144000 , 192000 , 200000
+    spk_cfg.task_pinned_core = APP_CPU_NUM;
+    // spk_cfg.task_priority = configMAX_PRIORITIES - 2;
+    spk_cfg.dma_buf_count = 10;
+    //spk_cfg.stereo = true;
+    spk_cfg.dma_buf_len = 192;
+#endif
     M5.Speaker.config(spk_cfg);
   }
 
 
   M5.Speaker.begin();
 
-  // BASICとFIREのV2.6で25MHzだと読み込めないため10MHzまで下げています。
+  // BASICとFIREのV2.6で25MHzだと読み込めないため15MHzまで下げています。
   SD.begin(GPIO_NUM_4, SPI, 15000000);
   
   delay(1000);
@@ -906,6 +922,12 @@ void setup(void)
 
   // タカオさん Jul 3 2023 Libraries VersionUP ※setBatteryIconがいない
   avatar.init(1); // start drawing
+  // タカオさん Aug 9 2023 Add ColorPalette Code (すでにアバター変更関連でColorpaletteを記載しているのでコメントのみ追記)
+  // cps = new ColorPalette();
+  // Avatarの色を変えたい場合は下記の2行のカラーコードを書き換えてください。
+  // cps->set(COLOR_PRIMARY, TFT_WHITE);         // 16進数で指定する場合は下記のように記述
+  // cps->set(COLOR_BACKGROUND, TFT_BLACK);      // (uint16_t)0xaabbcc
+  // avatar.setColorPalette(*cps);
   last_powericon_millis = millis();
   
   avatar.addTask(lipSync, "lipSync");  // 2023-11-11 コメント外し(テスト)
@@ -1197,6 +1219,8 @@ void loop(void)
       //Serial.printf("heap_caps_get_free_size(MALLOC_CAP_IRAM_8BIT)         : %6d\n", heap_caps_get_free_size(MALLOC_CAP_IRAM_8BIT) );
       Serial.printf("heap_caps_get_free_size(MALLOC_CAP_INVALID)           : %6d\n", heap_caps_get_free_size(MALLOC_CAP_INVALID) );
 
+      //
+      Serial.printf("free_block DMA: %6d\n", heap_caps_get_largest_free_block(MALLOC_CAP_DMA));
     #if !defined(ARDUINO_M5Stack_Core_ESP32) && !defined(ARDUINO_M5STACK_FIRE)
       if (M5.getBoard() == m5::board_t::board_M5StackCore2) {
       switch(checkTakaoBasePowerStatus(&M5.Power, &servo)) {
@@ -1236,6 +1260,7 @@ void loop(void)
 /*
     if ((system_config.getServoInfo(AXIS_X)->pin != 21)
       && (system_config.getServoInfo(AXIS_X)->pin != 22)) {
+      // Port.Aを利用する場合は、I2Cが使えないのでアイコンは表示しない。
       avatar.setBatteryStatus(M5.Power.isCharging(), M5.Power.getBatteryLevel());
       last_powericon_millis = millis();
     }
