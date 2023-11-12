@@ -13,6 +13,7 @@
 #include "Stackchan_servo.h"
 #include "BluetoothA2DPSink_M5Speaker.hpp"
 #include "Avatar.h"
+// #include "Stackchan_Takao_Base.hpp"
 #include "AtaruFace.h"
 #include "RamFace.h"
 #include "DannFace.h"
@@ -40,7 +41,7 @@ fs::FS json_fs = SD; // JSONファイルの収納場所(SPIFFS or SD)
 StackchanSystemConfig system_config;
 const char* stackchan_system_config_yaml = "/yaml/SC_Config.yaml";
 
-const unsigned long powericon_interval = 30000;  // バッテリーアイコンを更新する間隔(msec)
+const unsigned long powericon_interval = 3000;  // バッテリーアイコンを更新する間隔(msec)
 unsigned long last_powericon_millis = 0;
 
 bool bluetooth_mode = false; 
@@ -669,6 +670,8 @@ void avatarStop() {
   avatar.stop();  
 }
 
+
+
 Face* faces[8];
 const int facesSize = sizeof(faces) / sizeof(Face*);
 //int faceIdx = 1;
@@ -1121,6 +1124,7 @@ void loop(void)
     saveSettings = 0;
   }
 
+//  if ((millis() - last_powericon_millis)> powericon_interval) {
 #ifndef ARDUINO_M5Stack_Core_ESP32
   if (M5.getBoard() == m5::board_t::board_M5StackCore2) {
     if (M5.Power.Axp192.getACINVoltage() < 3.0f) {
@@ -1140,10 +1144,40 @@ void loop(void)
         last_discharge_time = 0;
       }
     }
+     /*     // タカオさん Aug 8 Takao_Base Support 2023-11-12 (バッテリー関連のためコメントでソース追加)
+      switch(checkTakaoBasePowerStatus(&M5.Power, &servo)) {
+        case 0: // 横から給電
+          avatar.setSpeechText("横から");
+          if (last_discharge_time > 0) {
+            last_discharge_time = 0;
+          }
+          break;
+        case 1: // 後ろから給電  
+          avatar.setSpeechText("後ろから");
+          if (last_discharge_time > 0) {
+            last_discharge_time = 0;
+          }
+          break;
+        case 2: // バッテリー
+          Serial.println("USBPowerUnPlugged.");
+          avatar.setSpeechText("バッテリー");
+
+          if ((system_config.getAutoPowerOffTime() > 0) and (last_discharge_time == 0)) {
+            last_discharge_time = millis();
+          } else if ((system_config.getAutoPowerOffTime() > 0) 
+                   and ((millis() - last_discharge_time) > system_config.getAutoPowerOffTime())) {
+            M5.Power.powerOff();
+          }
+          break;
+        default:
+          avatar.setSpeechText("UnknownStatus");
+          break;
+      }
+      */
   }
 #endif
   // 
-  // タカオさん Jul 3 2023 Libraries VersionUP ※setBatteryStatusがいない
+  // タカオさん Jul 3 2023 Libraries VersionUP ※setBatteryStatusでAvatar.h等の修正必要なためコメントでソース追加
   // if ((millis() - last_powericon_millis)> powericon_interval) {
   //   avatar.setBatteryStatus(M5.Power.isCharging(), M5.Power.getBatteryLevel());
   //   last_powericon_millis = millis();
