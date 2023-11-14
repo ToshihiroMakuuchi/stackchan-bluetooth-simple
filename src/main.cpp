@@ -134,14 +134,14 @@ NeoPixelEffects effects01 = NeoPixelEffects(
   0,              // エフェクト開始位置    pixstart
   9,              // エフェクト終了位置    pixend
   3,              // 点灯範囲 (COMET等)    aoe
-  50,             // エフェクトの間隔      delay_ms
+  75,             // エフェクトの間隔      delay_ms
   CRGB::Green,    // 色 (FastLED 指定色)   color_crgb
   true,           // ループするかどうか？  looping
   FORWARD         // エフェクトの方向      direction
 );
 
 // FastLED関連の初期設定 (PORT.B)       // Port.Bを利用する場合は77、93行目のコメントを外してください
-/*
+
 #define PORT_B_PIN 26
 #define PORT_B_LEDS 60                  // LEDテープの数と仕様により可変させてください
 
@@ -150,17 +150,17 @@ NeoPixelEffects effects02 = NeoPixelEffects(
   pb_leds,
   RAINBOWWAVE,    // エフェクトの種類      effect
   0,              // エフェクト開始位置    pixstart
-  31,             // エフェクト終了位置    pixend
+  59,             // エフェクト終了位置    pixend
   5,              // 点灯範囲 (COMET等)    aoe
   20,             // エフェクトの間隔      delay_ms
   CRGB::Green,    // 色 (FastLED 指定色)   color_crgb
   true,           // ループするかどうか？  looping
   FORWARD         // エフェクトの方向      direction
 );
-*/
+
 
 // FastLED関連の初期設定 (PORT.C)       // Port.Cを利用する場合は96、112行目のコメントを外してください
-/*
+
 #define PORT_C_PIN 14
 #define PORT_C_LEDS 60                  // LEDテープの数と仕様により可変させてください
 
@@ -169,14 +169,14 @@ NeoPixelEffects effects03 = NeoPixelEffects(
   pc_leds,
   RAINBOWWAVE,    // エフェクトの種類      effect
   0,              // エフェクト開始位置    pixstart
-  31,             // エフェクト終了位置    pixend
+  59,             // エフェクト終了位置    pixend
   5,              // 点灯範囲 (COMET等)    aoe
-  50,             // エフェクトの間隔      delay_ms
+  20,             // エフェクトの間隔      delay_ms
   CRGB::Green,    // 色 (FastLED 指定色)   color_crgb
   true,           // ループするかどうか？  looping
   FORWARD         // エフェクトの方向      direction
 );
-*/
+
 // FastLED関連の設定 end
 // LEDエフェクトの詳細はこちら:【NeoPixelEffect】 https://github.com/nolanmoore/NeoPixelEffects
 // 2023-11-10現在、まっく氏にてエフェクトをカスタム中…
@@ -961,8 +961,8 @@ void setup(void)
 #endif
 
   FastLED.addLeds<NEOPIXEL,INTERNAL_PIN>(internal_leds, INTERNAL_LEDS);  // FastLED関連 (内蔵LED)
-  // FastLED.addLeds<NEOPIXEL,PORT_B_PIN>(pb_leds, PORT_B_LEDS);         // FastLED関連 (Port.B) ※利用する場合はコメントアウトを外してください
-  // FastLED.addLeds<NEOPIXEL,PORT_C_PIN>(pc_leds, PORT_C_LEDS);         // FastLED関連 (Port.C) ※利用する場合はコメントアウトを外してください
+  FastLED.addLeds<NEOPIXEL,PORT_B_PIN>(pb_leds, PORT_B_LEDS);            // FastLED関連 (Port.B) ※利用する場合はコメントアウトを外してください
+  FastLED.addLeds<NEOPIXEL,PORT_C_PIN>(pc_leds, PORT_C_LEDS);            // FastLED関連 (Port.C) ※利用する場合はコメントアウトを外してください
   FastLED.setBrightness(30);                                             // FastLED関連 ※この値(明るさ)は20～30程度がオススメ
   Serial.begin(9600);                                                    // FastLED関連
 
@@ -1029,12 +1029,12 @@ void loop(void)
       if (box_led.contain(t.x, t.y))          // LEDエフェクトタップボタンの追加
       {
         currentEffectIndex++;
-        if (currentEffectIndex > 10) {
+        if (currentEffectIndex > 19) {
           currentEffectIndex = 0;
           }
         effects01.stop();                     // 内蔵LEDのLEDエフェクトを停止
-     // effects02.stop();                     // Port.BのLEDエフェクトを停止 ※利用する場合はコメントアウトを外してください
-     // effects03.stop();                     // Port.CのLEDエフェクトを停止 ※利用する場合はコメントアウトを外してください
+        effects02.stop();                     // Port.BのLEDエフェクトを停止 ※利用する場合はコメントアウトを外してください
+        effects03.stop();                     // Port.CのLEDエフェクトを停止 ※利用する場合はコメントアウトを外してください
         FastLED.clear();                      // LEDを消灯する
         FastLED.show();                       // 変更を反映
         delay(50);                            // タッチの連続入力を防ぐために少し待つ
@@ -1043,60 +1043,107 @@ void loop(void)
         // エフェクトを切り替える (パラメータは64行目以降の起動時エフェクトを参考に可変してみてください)
         switch (currentEffectIndex) {
           case 0:
-            effects01 = NeoPixelEffects(internal_leds, RAINBOWWAVE, 0, 9, 3, 50, CRGB::Green, true, FORWARD);
-         // effects02 = NeoPixelEffects(pb_leds, RAINBOWWAVE, 0, 59, 3, 50, CRGB::Green, true, FORWARD); // ※利用する場合はコメントアウトを外してください
-         // effects03 = NeoPixelEffects(pc_leds, RAINBOWWAVE, 0, 59, 3, 50, CRGB::Green, true, FORWARD); // ※利用する場合はコメントアウトを外してください
+            effects01 = NeoPixelEffects(internal_leds, RAINBOWWAVE, 0, 9, 3, 75, CRGB::Green, true, FORWARD);
+            effects02 = NeoPixelEffects(pb_leds, RAINBOWWAVE, 0, 59, 3, 20, CRGB::Green, true, FORWARD); // ※利用する場合はコメントアウトを外してください
+            effects03 = NeoPixelEffects(pc_leds, RAINBOWWAVE, 0, 59, 3, 20, CRGB::Green, true, FORWARD); // ※利用する場合はコメントアウトを外してください
             break;
           case 1:
-            effects01 = NeoPixelEffects(internal_leds, LARSON, 0, 9, 3, 50, CRGB::Red, true, FORWARD);
-         // effects02 = NeoPixelEffects(pb_leds, LARSON, 0, 59, 8, 5, CRGB::Red, true, FORWARD);         // ※利用する場合はコメントアウトを外してください
-         // effects03 = NeoPixelEffects(pc_leds, LARSON, 0, 59, 8, 5, CRGB::Red, true, REVERSE);         // ※利用する場合はコメントアウトを外してください
+            effects01 = NeoPixelEffects(internal_leds, FADE, 0, 9, 3, 50, CRGB::GreenYellow, true, FORWARD);
+            effects02 = NeoPixelEffects(pb_leds, FADE, 0, 59, 3, 50, CRGB::SeaGreen, true, FORWARD);     // ※利用する場合はコメントアウトを外してください
+            effects03 = NeoPixelEffects(pc_leds, FADE, 0, 59, 3, 50, CRGB::ForestGreen, true, FORWARD);     // ※利用する場合はコメントアウトを外してください
             break;
           case 2:
-            effects01 = NeoPixelEffects(internal_leds, CHASE, 0, 9, 3, 50, CRGB::Blue, true, FORWARD);
-         // effects02 = NeoPixelEffects(pb_leds, CHASE, 0, 59, 8, 50, CRGB::Blue, true, FORWARD);        // ※利用する場合はコメントアウトを外してください
-         // effects03 = NeoPixelEffects(pc_leds, CHASE, 0, 59, 8, 50, CRGB::Blue, true, FORWARD);        // ※利用する場合はコメントアウトを外してください
+            effects01 = NeoPixelEffects(internal_leds, COMET, 0, 9, 3, 50, CRGB::Magenta, true, FORWARD);
+            effects02 = NeoPixelEffects(pb_leds, COMET, 0, 59, 8, 5, CRGB::Magenta, true, FORWARD);      // ※利用する場合はコメントアウトを外してください
+            effects03 = NeoPixelEffects(pc_leds, COMET, 0, 59, 8, 5, CRGB::Magenta, true, REVERSE);      // ※利用する場合はコメントアウトを外してください
             break;
           case 3:
-            effects01 = NeoPixelEffects(internal_leds, COMET, 0, 9, 3, 50, CRGB::Magenta, true, FORWARD);
-         // effects02 = NeoPixelEffects(pb_leds, COMET, 0, 59, 8, 5, CRGB::Magenta, true, FORWARD);      // ※利用する場合はコメントアウトを外してください
-         // effects03 = NeoPixelEffects(pc_leds, COMET, 0, 59, 8, 5, CRGB::Magenta, true, FORWARD);      // ※利用する場合はコメントアウトを外してください
+            effects01 = NeoPixelEffects(internal_leds, LARSON, 0, 9, 3, 50, CRGB::Red, true, FORWARD);
+            effects02 = NeoPixelEffects(pb_leds, LARSON, 0, 59, 8, 5, CRGB::Red, true, FORWARD);         // ※利用する場合はコメントアウトを外してください
+            effects03 = NeoPixelEffects(pc_leds, LARSON, 0, 59, 8, 5, CRGB::Red, true, REVERSE);         // ※利用する場合はコメントアウトを外してください
             break;
           case 4:
-            effects01 = NeoPixelEffects(internal_leds, STROBE, 0, 9, 3, 50, CRGB::Orange, true, FORWARD);
-         // effects02 = NeoPixelEffects(pb_leds, STROBE, 0, 59, 3, 50, CRGB::Orange, true, FORWARD);     // ※利用する場合はコメントアウトを外してください
-         // effects03 = NeoPixelEffects(pc_leds, STROBE, 0, 59, 3, 50, CRGB::Orange, true, FORWARD);     // ※利用する場合はコメントアウトを外してください
+            effects01 = NeoPixelEffects(internal_leds, CHASE, 0, 9, 3, 100, CRGB::Blue, true, FORWARD);
+            effects02 = NeoPixelEffects(pb_leds, CHASE, 0, 59, 8, 100, CRGB::Blue, true, FORWARD);        // ※利用する場合はコメントアウトを外してください
+            effects03 = NeoPixelEffects(pc_leds, CHASE, 0, 59, 8, 100, CRGB::Blue, true, REVERSE);        // ※利用する場合はコメントアウトを外してください
             break;
           case 5:
-            effects01 = NeoPixelEffects(internal_leds, RANDOM, 0, 9, 3, 20, CRGB::Green, true, FORWARD);
-         // effects02 = NeoPixelEffects(pb_leds, RANDOM, 0, 59, 3, 20, CRGB::Green, true, FORWARD);      // ※利用する場合はコメントアウトを外してください
-         // effects03 = NeoPixelEffects(pc_leds, RANDOM, 0, 59, 3, 20, CRGB::Green, true, FORWARD);      // ※利用する場合はコメントアウトを外してください
+            effects01 = NeoPixelEffects(internal_leds, PULSE, 0, 9, 3, 50, CRGB::Magenta, true, FORWARD);
+            effects02 = NeoPixelEffects(pb_leds, PULSE, 0, 59, 8, 5, CRGB::Magenta, true, FORWARD);      // ※利用する場合はコメントアウトを外してください
+            effects03 = NeoPixelEffects(pc_leds, PULSE, 0, 59, 8, 5, CRGB::Magenta, true, REVERSE);      // ※利用する場合はコメントアウトを外してください
             break;
           case 6:
-            effects01 = NeoPixelEffects(internal_leds, FADEINOUT, 0, 9, 3, 0, CRGB::OrangeRed, true, FORWARD);
-         // effects02 = NeoPixelEffects(pb_leds, TRIWAVE, 0, 59, 15, 50, CRGB::MediumTurquoise, true, FORWARD); // ※利用する場合はコメントアウトを外してください
-         // effects03 = NeoPixelEffects(pc_leds, TRIWAVE, 0, 59, 15, 0, CRGB::OrangeRed, true, FORWARD);        // ※利用する場合はコメントアウトを外してください
+            effects01 = NeoPixelEffects(internal_leds, STATIC, 0, 9, 3, 50, CRGB::Orange, true, FORWARD);
+            effects02 = NeoPixelEffects(pb_leds, STATIC, 0, 59, 3, 50, CRGB::Orange, true, FORWARD);     // ※利用する場合はコメントアウトを外してください
+            effects03 = NeoPixelEffects(pc_leds, STATIC, 0, 59, 3, 50, CRGB::Orange, true, FORWARD);     // ※利用する場合はコメントアウトを外してください
             break;
           case 7:
-            effects01 = NeoPixelEffects(internal_leds, NANAIRO, 0, 9, 3, 10, CRGB::Red, true, FORWARD);
-         // effects02 = NeoPixelEffects(pb_leds, NANAIRO, 0, 59, 3, 10, CRGB::Red, true, FORWARD);       // ※利用する場合はコメントアウトを外してください
-         // effects03 = NeoPixelEffects(pc_leds, NANAIRO, 0, 59, 3, 10, CRGB::Red, true, FORWARD);       // ※利用する場合はコメントアウトを外してください
-            break;          
+            effects01 = NeoPixelEffects(internal_leds, FADE, 0, 9, 3, 50, CRGB::GreenYellow, true, FORWARD);
+            effects02 = NeoPixelEffects(pb_leds, FADE, 0, 59, 3, 50, CRGB::SeaGreen, true, FORWARD);     // ※利用する場合はコメントアウトを外してください
+            effects03 = NeoPixelEffects(pc_leds, FADE, 0, 59, 3, 50, CRGB::ForestGreen, true, FORWARD);     // ※利用する場合はコメントアウトを外してください
+            break;
           case 8:
-            effects01 = NeoPixelEffects(internal_leds, NONE, 0, 9, 3, 50, CRGB::Red, true, FORWARD);
-         // effects02 = NeoPixelEffects(pb_leds, FIRE, 0, 59, 8, 5, CRGB::Red, true, FORWARD);           // ※利用する場合はコメントアウトを外してください
-         // effects03 = NeoPixelEffects(pc_leds, FIRE, 0, 59, 8, 5, CRGB::Red, true, FORWARD);           // ※利用する場合はコメントアウトを外してください
+            effects01 = NeoPixelEffects(internal_leds, FILLIN, 0, 9, 3, 50, CRGB::RoyalBlue, true, FORWARD);
+            effects02 = NeoPixelEffects(pb_leds, FILLIN, 0, 59, 3, 50, CRGB::SkyBlue, true, FORWARD);     // ※利用する場合はコメントアウトを外してください
+            effects03 = NeoPixelEffects(pc_leds, FILLIN, 0, 59, 3, 50, CRGB::CadetBlue, true, FORWARD);     // ※利用する場合はコメントアウトを外してください
             break;
           case 9:
-            effects01 = NeoPixelEffects(internal_leds, FIRE, 0, 9, 3, 50, CRGB::Green, true, FORWARD);   // あえてここで消灯を入れます (9タップ目)
-         // effects02 = NeoPixelEffects(pb_leds, NONE, 0, 59, 3, 50, CRGB::Green, true, FORWARD);        // ※利用する場合はコメントアウトを外してください
-         // effects03 = NeoPixelEffects(pc_leds, NONE, 0, 59, 3, 50, CRGB::Green, true, FORWARD);        // ※利用する場合はコメントアウトを外してください
+            effects01 = NeoPixelEffects(internal_leds, GLOW, 0, 9, 3, 50, CRGB::IndianRed, true, FORWARD);
+            effects02 = NeoPixelEffects(pb_leds, GLOW, 0, 59, 3, 50, CRGB::MediumVioletRed, true, FORWARD);     // ※利用する場合はコメントアウトを外してください
+            effects03 = NeoPixelEffects(pc_leds, GLOW, 0, 59, 3, 50, CRGB::DarkRed, true, FORWARD);     // ※利用する場合はコメントアウトを外してください
             break;
           case 10:
-            effects01 = NeoPixelEffects(internal_leds, SINEWAVE, 0, 9, 3, 5, CRGB::Green, true, FORWARD);
-         // effects02 = NeoPixelEffects(pb_leds, PULSE, 0, 59, 8, 10, CRGB::DarkMagenta, true, FORWARD); // ※利用する場合はコメントアウトを外してください
-         // effects03 = NeoPixelEffects(pc_leds, PULSE, 0, 59, 8, 10, CRGB::Red, true, REVERSE);         // ※利用する場合はコメントアウトを外してください
+            effects01 = NeoPixelEffects(internal_leds, STROBE, 0, 9, 3, 50, CRGB::Orange, true, FORWARD);
+            effects02 = NeoPixelEffects(pb_leds, STROBE, 0, 59, 3, 50, CRGB::Orange, true, FORWARD);     // ※利用する場合はコメントアウトを外してください
+            effects03 = NeoPixelEffects(pc_leds, STROBE, 0, 59, 3, 50, CRGB::Orange, true, FORWARD);     // ※利用する場合はコメントアウトを外してください
             break;
+          case 11:
+            effects01 = NeoPixelEffects(internal_leds, SINEWAVE, 0, 9, 3, 20, CRGB::Green, true, FORWARD);
+            effects02 = NeoPixelEffects(pb_leds, SINEWAVE, 0, 59, 3, 20, CRGB::Green, true, FORWARD);      // ※利用する場合はコメントアウトを外してください
+            effects03 = NeoPixelEffects(pc_leds, SINEWAVE, 0, 59, 3, 20, CRGB::Green, true, FORWARD);      // ※利用する場合はコメントアウトを外してください
+            break;
+          case 12:
+            effects01 = NeoPixelEffects(internal_leds, RANDOM, 0, 9, 3, 20, CRGB::LightGoldenrodYellow, true, FORWARD);
+            effects02 = NeoPixelEffects(pb_leds, RANDOM, 0, 59, 3, 20, CRGB::Yellow, true, FORWARD);      // ※利用する場合はコメントアウトを外してください
+            effects03 = NeoPixelEffects(pc_leds, RANDOM, 0, 59, 3, 20, CRGB::YellowGreen, true, FORWARD);      // ※利用する場合はコメントアウトを外してください
+            break;
+          case 13:
+            effects01 = NeoPixelEffects(internal_leds, TRIWAVE, 0, 9, 3, 20, CRGB::LightGoldenrodYellow, true, FORWARD);
+            effects02 = NeoPixelEffects(pb_leds, TRIWAVE, 0, 59, 3, 20, CRGB::Yellow, true, FORWARD);      // ※利用する場合はコメントアウトを外してください
+            effects03 = NeoPixelEffects(pc_leds, TRIWAVE, 0, 59, 3, 20, CRGB::YellowGreen, true, FORWARD);      // ※利用する場合はコメントアウトを外してください
+            break;
+          case 14:
+            effects01 = NeoPixelEffects(internal_leds, NONE, 0, 9, 3, 20, CRGB::LightGoldenrodYellow, true, FORWARD);
+            effects02 = NeoPixelEffects(pb_leds, NONE, 0, 59, 3, 20, CRGB::Yellow, true, FORWARD);      // ※利用する場合はコメントアウトを外してください
+            effects03 = NeoPixelEffects(pc_leds, NONE, 0, 59, 3, 20, CRGB::YellowGreen, true, FORWARD);      // ※利用する場合はコメントアウトを外してください
+            break;
+          case 15:
+            effects01 = NeoPixelEffects(internal_leds, FADEINOUT, 0, 9, 3, 20, CRGB::LightGoldenrodYellow, true, FORWARD);
+            effects02 = NeoPixelEffects(pb_leds, FADEINOUT, 0, 59, 3, 20, CRGB::Yellow, true, FORWARD);      // ※利用する場合はコメントアウトを外してください
+            effects03 = NeoPixelEffects(pc_leds, FADEINOUT, 0, 59, 3, 20, CRGB::YellowGreen, true, FORWARD);      // ※利用する場合はコメントアウトを外してください
+            break;
+          case 16:
+            effects01 = NeoPixelEffects(internal_leds, NANAIRO, 0, 9, 3, 20, CRGB::LightGoldenrodYellow, true, FORWARD);
+            effects02 = NeoPixelEffects(pb_leds, NANAIRO, 0, 59, 3, 20, CRGB::Yellow, true, FORWARD);      // ※利用する場合はコメントアウトを外してください
+            effects03 = NeoPixelEffects(pc_leds, NANAIRO, 0, 59, 3, 20, CRGB::YellowGreen, true, FORWARD);      // ※利用する場合はコメントアウトを外してください
+            break;
+          case 17:
+            effects01 = NeoPixelEffects(internal_leds, MERAMERA, 0, 9, 3, 20, CRGB::LightGoldenrodYellow, true, FORWARD);
+            effects02 = NeoPixelEffects(pb_leds, MERAMERA, 0, 59, 3, 20, CRGB::Yellow, true, FORWARD);      // ※利用する場合はコメントアウトを外してください
+            effects03 = NeoPixelEffects(pc_leds, MERAMERA, 0, 59, 3, 20, CRGB::YellowGreen, true, FORWARD);      // ※利用する場合はコメントアウトを外してください
+            break;
+          case 18:
+            effects01 = NeoPixelEffects(internal_leds, FIRE, 0, 9, 3, 0, CRGB::OrangeRed, true, FORWARD);
+            effects02 = NeoPixelEffects(pb_leds, FIRE, 0, 59, 15, 50, CRGB::MediumTurquoise, true, FORWARD); // ※利用する場合はコメントアウトを外してください
+            effects03 = NeoPixelEffects(pc_leds, FIRE, 0, 59, 15, 0, CRGB::OrangeRed, true, FORWARD);        // ※利用する場合はコメントアウトを外してください
+            break;
+          case 19:
+            effects01 = NeoPixelEffects(internal_leds, NONE, 0, 9, 3, 10, CRGB::Red, true, FORWARD);
+            effects02 = NeoPixelEffects(pb_leds, NONE, 0, 59, 3, 10, CRGB::Red, true, FORWARD);       // ※利用する場合はコメントアウトを外してください
+            effects03 = NeoPixelEffects(pc_leds, NONE, 0, 59, 3, 10, CRGB::Red, true, FORWARD);       // ※利用する場合はコメントアウトを外してください
+            break;
+          default:
+            break;          
         }
       }
     }
@@ -1268,8 +1315,8 @@ void loop(void)
 */
 
 effects01.update();           // 内蔵LED定義の更新
-// effects02.update();        // Port.B定義の更新 // ※利用する場合はコメントアウトを外してください
-// effects03.update();        // Port.C定義の更新 // ※利用する場合はコメントアウトを外してください
+effects02.update();           // Port.B定義の更新 // ※利用する場合はコメントアウトを外してください
+effects03.update();           // Port.C定義の更新 // ※利用する場合はコメントアウトを外してください
 FastLED.show();               // FastLED初期化
 delay(10);
 }

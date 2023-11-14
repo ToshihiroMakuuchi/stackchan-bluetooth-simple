@@ -45,8 +45,9 @@ enum EffectType {
   TALKING,
   TRIWAVE,
   FADEINOUT,                //2023-11-08 追加
-  FIRE,                     //2023-11-08 追加
+  MERAMERA,                 //2023-11-13 追加
   NANAIRO,                  //2023-11-08 追加
+  FIRE,                     //2023-11-13 追加
   NUM_EFFECT
 };
 
@@ -103,8 +104,9 @@ class NeoPixelEffects {
     void updateWaveEffect(int subtype);
     void updateTalkingEffect();
     void updateFadeInOutEffect();  // 2023-11-08 追加
-    void updateFireEffect();       // 2023-11-08 追加
+    void updateMerameraEffect();   // 2023-11-13 追加
     void updateNanairoEffect();    // 2023-11-08 追加
+    void updateFireEffect();       // 2023-11-13 追加
 
     CRGB *_pixset;          // A reference to the one created in the user code
     CRGB _color_fg;
@@ -121,7 +123,7 @@ class NeoPixelEffects {
       _counter;
     uint8_t _subtype;          // Defines sub type to be used
     bool
-      effectFinished,       // エフェクトが完了したかどうかを追跡する
+      effectFinished,       // エフェクトが完了したかどうかを追跡する    // 2023-11-08 追加
       _repeat,              // Whether or not the effect loops in area
       _direction;           // Whether or not the effect moves from start to end pixel
     unsigned long

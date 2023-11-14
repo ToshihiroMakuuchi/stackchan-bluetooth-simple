@@ -128,12 +128,15 @@ void NeoPixelEffects::update()
         case FADEINOUT:                   // 2023-11-08 追加
           updateFadeInOutEffect();        // 2023-11-08 追加
           break;                          // 2023-11-08 追加
-        case FIRE:                        // 2023-11-08 追加
-          updateFireEffect();             // 2023-11-08 追加
-          break;                          // 2023-11-08 追加
+        case MERAMERA:                    // 2023-11-13 変更
+          updateMerameraEffect();         // 2023-11-13 変更
+          break;                          // 2023-11-13 変更
         case NANAIRO:                     // 2023-11-08 追加
           updateNanairoEffect();          // 2023-11-08 追加
           break;                          // 2023-11-08 追加
+        case FIRE:                        // 2023-11-13 追加
+          updateFireEffect();             // 2023-11-13 追加
+          break;                          // 2023-11-13 追加
         default:
           break;
       }
@@ -498,7 +501,7 @@ void NeoPixelEffects::updateFadeInOutEffect() {
     }
 }
 
-void NeoPixelEffects::updateFireEffect() {
+void NeoPixelEffects::updateMerameraEffect() {
   // エフェクトがアクティブでない場合は何もしない
   if (_status != ACTIVE) return;
 
@@ -513,7 +516,7 @@ void NeoPixelEffects::updateFireEffect() {
 
   // ピクセルに熱を加える
   for (int i = _pixstart; i < _pixend; i++) {
-    heat[i] = qadd8(heat[i], random8(160, 255));
+    heat[i] = qadd8(heat[i], random8(130, 255));
   }
 
   // 熱をもとにピクセルの色を設定する
@@ -522,12 +525,12 @@ void NeoPixelEffects::updateFireEffect() {
     CRGB color = HeatColor(heat[i]);
 
     // ここで色をカスタマイズする
-    color.red = qadd8(color.red, 200);      // 赤色成分を強くする
-    color.green = qsub8(color.green, 50);  // 緑色と青色成分を減少させる（炎の色をより赤くする）
-    color.blue = qsub8(color.blue, 50);    // 緑色と青色成分を減少させる（炎の色をより赤くする）
+    color.red = qadd8(color.red, 0);        // 赤色成分を強くする
+    color.green = qsub8(color.green, 230);  // 緑色と青色成分を減少させる（炎の色をより赤くする）
+    color.blue = qsub8(color.blue, 230);    // 緑色と青色成分を減少させる（炎の色をより赤くする）
 
     // 明るさの減衰をシミュレート
-    color.nscale8_video(random8(140, 255));
+    color.nscale8_video(random8(90, 255));
 
     // ピクセルを設定
     _pixset[i] = color;
@@ -587,6 +590,56 @@ void NeoPixelEffects::updateNanairoEffect() {
 }
 // ---------------------------- // 2023-11-08 追加
 
+/*
+// ---------------------------- // 2023-11-13 追加
+void NeoPixelEffects::updateFireEffect() {
+    CRGBPalette16 currentPalette(CRGB::Black, CRGB::Black, CRGB::Black, CRGB::Maroon,
+                                 CRGB::DarkRed, CRGB::Red, CRGB::Red, CRGB::Red,
+                                 CRGB::DarkOrange, CRGB::Orange, CRGB::Orange, CRGB::Orange,
+                                 CRGB::Yellow, CRGB::Yellow, CRGB::Gray, CRGB::Gray);
+
+    //for (int i = 0; i < _numLeds; i++) {
+    for (int i = _pixstart; i <= _pixend; i++) {
+        uint8_t index = inoise8(i * 20, millis() * 3 * _pixrange / 255);
+        _pixset[i] = ColorFromPalette(currentPalette, min(i * (index) >> 6, 255), i * 255 / _pixrange, LINEARBLEND);
+    }
+}
+// ---------------------------- // 2023-11-13 追加
+*/
+/*
+// ---------------------------- // 2023-11-14 追加
+void NeoPixelEffects::updateFireEffect() {
+    CRGBPalette16 currentPalette = CRGBPalette16(
+        CRGB::Black, CRGB::Maroon, CRGB::DarkRed, CRGB::Red,
+        CRGB::Red, CRGB::Red, CRGB::DarkOrange, CRGB::Orange,
+        CRGB::Orange, CRGB::Yellow, CRGB::Yellow, CRGB::Yellow,
+        CRGB::White, CRGB::White, CRGB::White, CRGB::White
+    );
+
+    for (int i = _pixstart; i <= _pixend; i++) {
+        uint8_t index = inoise8(i * 20, millis() * 3 * _pixrange / 255);
+        _pixset[i] = ColorFromPalette(currentPalette, min(i * (index) >> 6, 255), i * 255 / _pixrange, LINEARBLEND);
+    }
+}
+// ---------------------------- // 2023-11-14 追加
+*/
+
+// ---------------------------- // 逆パターン 2023-11-14 追加
+void NeoPixelEffects::updateFireEffect() {
+    CRGBPalette16 currentPalette = CRGBPalette16(
+        CRGB::Black, CRGB::Maroon, CRGB::DarkRed, CRGB::Red,
+        CRGB::Red, CRGB::Red, CRGB::DarkOrange, CRGB::Orange,
+        CRGB::Orange, CRGB::Yellow, CRGB::Yellow, CRGB::Yellow,
+        CRGB::White, CRGB::White, CRGB::White, CRGB::White
+    );
+
+    // LED配列の最後から最初に向かって更新
+    for (int i = _pixend; i >= _pixstart; i--) {
+        uint8_t index = inoise8(i * 20, millis() * 3 * _pixrange / 255);
+        _pixset[i] = ColorFromPalette(currentPalette, min((_pixend - i) * (index) >> 6, 255), (_pixend - i) * 255 / _pixrange, LINEARBLEND);
+    }
+}
+// ---------------------------- // 2023-11-14 追加
 
 EffectType NeoPixelEffects::getEffect()
 {
