@@ -627,10 +627,10 @@ void NeoPixelEffects::updateFireEffect() {
 // ---------------------------- // 逆パターン 2023-11-14 追加
 void NeoPixelEffects::updateFireEffect() {
     CRGBPalette16 currentPalette = CRGBPalette16(
-        CRGB::Black, CRGB::Maroon, CRGB::DarkRed, CRGB::Red,
-        CRGB::Red, CRGB::Red, CRGB::DarkOrange, CRGB::Orange,
-        CRGB::Orange, CRGB::Yellow, CRGB::Yellow, CRGB::Yellow,
-        CRGB::White, CRGB::White, CRGB::White, CRGB::White
+        CRGB::Black, CRGB::Maroon, CRGB::DarkRed, CRGB::DarkRed,
+        CRGB::Red, CRGB::Red, CRGB::DarkOrange, CRGB::DarkOrange,
+        CRGB::Orange, CRGB::Orange, CRGB::FairyLightNCC, CRGB::Yellow,
+        CRGB::Yellow, CRGB::LightYellow, CRGB::Snow, CRGB::White
     );
 
     // LED配列の最後から最初に向かって更新
