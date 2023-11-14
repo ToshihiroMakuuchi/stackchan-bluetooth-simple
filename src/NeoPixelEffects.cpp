@@ -590,41 +590,7 @@ void NeoPixelEffects::updateNanairoEffect() {
 }
 // ---------------------------- // 2023-11-08 追加
 
-/*
-// ---------------------------- // 2023-11-13 追加
-void NeoPixelEffects::updateFireEffect() {
-    CRGBPalette16 currentPalette(CRGB::Black, CRGB::Black, CRGB::Black, CRGB::Maroon,
-                                 CRGB::DarkRed, CRGB::Red, CRGB::Red, CRGB::Red,
-                                 CRGB::DarkOrange, CRGB::Orange, CRGB::Orange, CRGB::Orange,
-                                 CRGB::Yellow, CRGB::Yellow, CRGB::Gray, CRGB::Gray);
-
-    //for (int i = 0; i < _numLeds; i++) {
-    for (int i = _pixstart; i <= _pixend; i++) {
-        uint8_t index = inoise8(i * 20, millis() * 3 * _pixrange / 255);
-        _pixset[i] = ColorFromPalette(currentPalette, min(i * (index) >> 6, 255), i * 255 / _pixrange, LINEARBLEND);
-    }
-}
-// ---------------------------- // 2023-11-13 追加
-*/
-/*
 // ---------------------------- // 2023-11-14 追加
-void NeoPixelEffects::updateFireEffect() {
-    CRGBPalette16 currentPalette = CRGBPalette16(
-        CRGB::Black, CRGB::Maroon, CRGB::DarkRed, CRGB::Red,
-        CRGB::Red, CRGB::Red, CRGB::DarkOrange, CRGB::Orange,
-        CRGB::Orange, CRGB::Yellow, CRGB::Yellow, CRGB::Yellow,
-        CRGB::White, CRGB::White, CRGB::White, CRGB::White
-    );
-
-    for (int i = _pixstart; i <= _pixend; i++) {
-        uint8_t index = inoise8(i * 20, millis() * 3 * _pixrange / 255);
-        _pixset[i] = ColorFromPalette(currentPalette, min(i * (index) >> 6, 255), i * 255 / _pixrange, LINEARBLEND);
-    }
-}
-// ---------------------------- // 2023-11-14 追加
-*/
-
-// ---------------------------- // 逆パターン 2023-11-14 追加
 void NeoPixelEffects::updateFireEffect() {
     CRGBPalette16 currentPalette = CRGBPalette16(
         CRGB::Black, CRGB::Maroon, CRGB::DarkRed, CRGB::DarkRed,
