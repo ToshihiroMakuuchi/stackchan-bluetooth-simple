@@ -45,8 +45,8 @@ enum EffectType {
   TALKING,
   TRIWAVE,
   FADEINOUT,                //2023-11-08 追加
-  MERAMERA,                 //2023-11-13 追加
   NANAIRO,                  //2023-11-08 追加
+  MERAMERA,                 //2023-11-13 追加
   FIRE,                     //2023-11-13 追加
   NUM_EFFECT
 };
@@ -104,8 +104,8 @@ class NeoPixelEffects {
     void updateWaveEffect(int subtype);
     void updateTalkingEffect();
     void updateFadeInOutEffect();  // 2023-11-08 追加
-    void updateMerameraEffect();   // 2023-11-13 追加
     void updateNanairoEffect();    // 2023-11-08 追加
+    void updateMerameraEffect();   // 2023-11-13 追加
     void updateFireEffect();       // 2023-11-13 追加
 
     CRGB *_pixset;          // A reference to the one created in the user code

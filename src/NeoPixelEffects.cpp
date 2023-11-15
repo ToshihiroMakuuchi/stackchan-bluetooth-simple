@@ -100,7 +100,7 @@ void NeoPixelEffects::update()
           break;
         case RANDOM:
           updateStaticEffect(1);
-          break;
+          break;        
         case FADE:
           updateFadeOutEffect();
           break;
@@ -128,12 +128,12 @@ void NeoPixelEffects::update()
         case FADEINOUT:                   // 2023-11-08 追加
           updateFadeInOutEffect();        // 2023-11-08 追加
           break;                          // 2023-11-08 追加
-        case MERAMERA:                    // 2023-11-13 変更
-          updateMerameraEffect();         // 2023-11-13 変更
-          break;                          // 2023-11-13 変更
         case NANAIRO:                     // 2023-11-08 追加
           updateNanairoEffect();          // 2023-11-08 追加
           break;                          // 2023-11-08 追加
+        case MERAMERA:                    // 2023-11-13 変更
+          updateMerameraEffect();         // 2023-11-13 変更
+          break;                          // 2023-11-13 変更
         case FIRE:                        // 2023-11-13 追加
           updateFireEffect();             // 2023-11-13 追加
           break;                          // 2023-11-13 追加
@@ -463,6 +463,7 @@ void NeoPixelEffects::updateTalkingEffect()
   }
 }
 
+
 // ---------------------------- // 2023-11-08 追加
 // フェードのスピードを調整する変数
 int fadeIncrement = 5; // スピードを遅くするにはこの値を小さく、速くするには大きくします。
@@ -499,45 +500,6 @@ void NeoPixelEffects::updateFadeInOutEffect() {
         fadeValue += fadeIncrement; // Increment fade value
         return; // Return to exit the function
     }
-}
-
-void NeoPixelEffects::updateMerameraEffect() {
-  // エフェクトがアクティブでない場合は何もしない
-  if (_status != ACTIVE) return;
-
-  // 火のエフェクト用のバッファを初期化
-  static byte heat[256];
-
-  // 炎を下から上に移動させる
-  for (int i = _pixend; i >= _pixstart; i--) {
-    // 炎のランダムなクロールをシミュレート
-    heat[i] = qsub8(heat[i + 1], random8(0, ((_pixaoe * 10) / _pixrange) + 2));
-  }
-
-  // ピクセルに熱を加える
-  for (int i = _pixstart; i < _pixend; i++) {
-    heat[i] = qadd8(heat[i], random8(130, 255));
-  }
-
-  // 熱をもとにピクセルの色を設定する
-  for (int i = _pixstart; i < _pixend; i++) {
-    // 熱を色に変換する
-    CRGB color = HeatColor(heat[i]);
-
-    // ここで色をカスタマイズする
-    color.red = qadd8(color.red, 0);        // 赤色成分を強くする
-    color.green = qsub8(color.green, 230);  // 緑色と青色成分を減少させる（炎の色をより赤くする）
-    color.blue = qsub8(color.blue, 230);    // 緑色と青色成分を減少させる（炎の色をより赤くする）
-
-    // 明るさの減衰をシミュレート
-    color.nscale8_video(random8(90, 255));
-
-    // ピクセルを設定
-    _pixset[i] = color;
-  }
-
-  // ストリップを表示
-  showStrip();
 }
 
 void NeoPixelEffects::updateNanairoEffect() {
@@ -588,7 +550,47 @@ void NeoPixelEffects::updateNanairoEffect() {
         return; // このステップで制御を戻す
     }
 }
+
+void NeoPixelEffects::updateMerameraEffect() {
+  // エフェクトがアクティブでない場合は何もしない
+  if (_status != ACTIVE) return;
+
+  // 火のエフェクト用のバッファを初期化
+  static byte heat[256];
+
+  // 炎を下から上に移動させる
+  for (int i = _pixend; i >= _pixstart; i--) {
+    // 炎のランダムなクロールをシミュレート
+    heat[i] = qsub8(heat[i + 1], random8(0, ((_pixaoe * 10) / _pixrange) + 2));
+  }
+
+  // ピクセルに熱を加える
+  for (int i = _pixstart; i < _pixend; i++) {
+    heat[i] = qadd8(heat[i], random8(130, 255));
+  }
+
+  // 熱をもとにピクセルの色を設定する
+  for (int i = _pixstart; i < _pixend; i++) {
+    // 熱を色に変換する
+    CRGB color = HeatColor(heat[i]);
+
+    // ここで色をカスタマイズする
+    color.red = qadd8(color.red, 0);        // 赤色成分を強くする
+    color.green = qsub8(color.green, 230);  // 緑色と青色成分を減少させる（炎の色をより赤くする）
+    color.blue = qsub8(color.blue, 230);    // 緑色と青色成分を減少させる（炎の色をより赤くする）
+
+    // 明るさの減衰をシミュレート
+    color.nscale8_video(random8(90, 255));
+
+    // ピクセルを設定
+    _pixset[i] = color;
+  }
+
+  // ストリップを表示
+  showStrip();
+}
 // ---------------------------- // 2023-11-08 追加
+
 
 // ---------------------------- // 2023-11-14 追加
 void NeoPixelEffects::updateFireEffect() {
@@ -606,6 +608,7 @@ void NeoPixelEffects::updateFireEffect() {
     }
 }
 // ---------------------------- // 2023-11-14 追加
+
 
 EffectType NeoPixelEffects::getEffect()
 {
