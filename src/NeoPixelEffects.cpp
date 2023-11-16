@@ -465,11 +465,11 @@ void NeoPixelEffects::updateTalkingEffect()
 
 
 // ---------------------------- // 2023-11-08 追加
-// フェードのスピードを調整する変数
-int fadeIncrement = 5; // スピードを遅くするにはこの値を小さく、速くするには大きくします。
+//                              // フェードのスピードを調整する変数
+int fadeIncrement = 7;          // スピードを遅くするにはこの値を小さく、速くするには大きくします。
 
 void NeoPixelEffects::updateFadeInOutEffect() {
-    if (effectFinished) { // If the effect is finished then reset
+    if (effectFinished) {                     // エフェクトが完了していれば初期化
         fadeValue = 0;
         effectFinished = false;
     }
@@ -479,31 +479,31 @@ void NeoPixelEffects::updateFadeInOutEffect() {
         float r = (fadeValue / 255.0) * _color_fg.r;
         float g = (fadeValue / 255.0) * _color_fg.g;
         float b = (fadeValue / 255.0) * _color_fg.b;
-        setAll(r, g, b); // Set LED values
+        setAll(r, g, b);                     // 計算した値でLEDを設定
         showStrip();
-        fadeValue += fadeIncrement; // Increment fade value
-        return; // Return to exit the function
+        fadeValue += fadeIncrement;          // フェード速度を調整
+        return;                              // このステップで制御を戻す
     }
 
     // Fade out
     if (fadeValue >= 255) {
-        int newFadeValue = 510 - fadeValue; // Subtract from 255 to 0
-        if (newFadeValue < 0) { // If the effect is finished
+        int newFadeValue = 510 - fadeValue; // 255から0まで減算
+        if (newFadeValue < 0) {             // エフェクトが完了
             effectFinished = true;
             return;
         }
         float r = (newFadeValue / 255.0) * _color_fg.r;
         float g = (newFadeValue / 255.0) * _color_fg.g;
         float b = (newFadeValue / 255.0) * _color_fg.b;
-        setAll(r, g, b); // Set LED values
+        setAll(r, g, b);                    // 計算した値でLEDを設定
         showStrip();
-        fadeValue += fadeIncrement; // Increment fade value
-        return; // Return to exit the function
+        fadeValue += fadeIncrement;         // フェード速度を調整
+        return;                             // このステップで制御を戻す
     }
 }
 
 void NeoPixelEffects::updateNanairoEffect() {
-    static int colorIndex = 0; // 現在の色のインデックス
+    static int colorIndex = 0;              // 現在の色のインデックス
     static CRGB colors[] = {
         CRGB::Red,
         CRGB::Orange,
@@ -514,13 +514,12 @@ void NeoPixelEffects::updateNanairoEffect() {
         CRGB::Violet
     }; // 七色の配列
 
-    // エフェクトが完了していれば初期化
-    if (effectFinished) {
+    if (effectFinished) {                    // エフェクトが完了していれば初期化
         fadeValue = 0;
         effectFinished = false;
         // 次の色に移動
         colorIndex = (colorIndex + 1) % (sizeof(colors) / sizeof(colors[0]));
-        _color_fg = colors[colorIndex]; // 次の色を設定
+        _color_fg = colors[colorIndex];      // 次の色を設定
     }
 
     // フェードイン
@@ -528,26 +527,26 @@ void NeoPixelEffects::updateNanairoEffect() {
         float r = (fadeValue / 255.0) * _color_fg.r;
         float g = (fadeValue / 255.0) * _color_fg.g;
         float b = (fadeValue / 255.0) * _color_fg.b;
-        setAll(r, g, b); // 計算した値でLEDを設定
+        setAll(r, g, b);                    // 計算した値でLEDを設定
         showStrip();
-        fadeValue += 5; // フェード速度を調整
-        return; // このステップで制御を戻す
+        fadeValue += fadeIncrement;         // フェード速度を調整
+        return;                             // このステップで制御を戻す
     }
 
     // フェードアウト
     if (fadeValue >= 255) {
         int newFadeValue = 510 - fadeValue; // 255から0まで減算
-        if (newFadeValue < 0) { // エフェクトが完了
+        if (newFadeValue < 0) {             // エフェクトが完了
             effectFinished = true;
             return;
         }
         float r = (newFadeValue / 255.0) * _color_fg.r;
         float g = (newFadeValue / 255.0) * _color_fg.g;
         float b = (newFadeValue / 255.0) * _color_fg.b;
-        setAll(r, g, b); // 計算した値でLEDを設定
+        setAll(r, g, b);                    // 計算した値でLEDを設定
         showStrip();
-        fadeValue += 5; // フェード速度を調整
-        return; // このステップで制御を戻す
+        fadeValue += fadeIncrement;         // フェード速度を調整
+        return;                             // このステップで制御を戻す
     }
 }
 
