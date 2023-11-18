@@ -1048,9 +1048,9 @@ void loop(void)
             effects03 = NeoPixelEffects(pc_leds, RAINBOWWAVE, 0, 59, 3, 20, CRGB::Green, true, FORWARD);      // ※利用する場合はコメントアウトしてください
             break;
           case 1:
-            effects01 = NeoPixelEffects(internal_leds, COMET, 0, 9, 3, 50, CRGB::Magenta, true, FORWARD);     // 流れ星エフェクト
-            effects02 = NeoPixelEffects(pb_leds, COMET, 0, 59, 8, 5, CRGB::Magenta, true, FORWARD);           // ※利用する場合はコメントアウトしてください
-            effects03 = NeoPixelEffects(pc_leds, COMET, 0, 59, 8, 5, CRGB::Magenta, true, REVERSE);           // ※利用する場合はコメントアウトしてください
+            effects01 = NeoPixelEffects(internal_leds, COMET, 0, 9, 3, 0, CRGB::Magenta, true, FORWARD);     // 流れ星エフェクト
+            effects02 = NeoPixelEffects(pb_leds, COMET, 0, 59, 8, 0, CRGB::PaleVioletRed, true, FORWARD);           // ※利用する場合はコメントアウトしてください
+            effects03 = NeoPixelEffects(pc_leds, COMET, 0, 59, 8, 0, CRGB::SeaGreen, true, FORWARD);           // ※利用する場合はコメントアウトしてください
             break;
           case 2:
             effects01 = NeoPixelEffects(internal_leds, LARSON, 0, 9, 3, 50, CRGB::Red, true, FORWARD);        // 端まで流れて戻ってくるナイトライダー系エフェクト
@@ -1128,9 +1128,9 @@ void loop(void)
             effects03 = NeoPixelEffects(pc_leds, FIRE, 0, 59, 15, 0, CRGB::Red, true, FORWARD);         // ※利用する場合はコメントアウトしてください
             break;
           case 17:
-            effects01 = NeoPixelEffects(internal_leds, BOUNCING, 0, 9, 1, 0, CRGB::OrangeRed, true, FORWARD);     // ボールが跳ねるようなエフェクト LED 1～4弾まで
-            effects02 = NeoPixelEffects(pb_leds, BOUNCING, 0, 59, 4, 0, CRGB::DarkSeaGreen, true, FORWARD);       // ※利用する場合はコメントアウトしてください LED 1～4弾まで
-            effects03 = NeoPixelEffects(pc_leds, BOUNCING, 0, 59, 4 , 0, CRGB::DarkBlue, true, FORWARD);          // ※利用する場合はコメントアウトしてください LED 1～4弾まで
+            effects01 = NeoPixelEffects(internal_leds, BOUNCING, 0, 9, 1, 0, CRGB::OrangeRed, true, FORWARD);     // ボールが跳ねるようなエフェクト LED 1～3弾まで
+            effects02 = NeoPixelEffects(pb_leds, BOUNCING, 0, 59, 3, 0, CRGB::DarkSeaGreen, true, FORWARD);       // ※利用する場合はコメントアウトしてください LED 1～3弾まで
+            effects03 = NeoPixelEffects(pc_leds, BOUNCING, 0, 59, 3 , 0, CRGB::DarkBlue, true, FORWARD);          // ※利用する場合はコメントアウトしてください LED 1～3弾まで
             break;
           case 18:
             effects01 = NeoPixelEffects(internal_leds, NONE, 0, 9, 3, 10, CRGB::Red, true, FORWARD);          // エフェクト停止
