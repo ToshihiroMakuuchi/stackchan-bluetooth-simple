@@ -59,6 +59,15 @@ NeoPixelEffects::~NeoPixelEffects()
   *_pixset = CRGB();
 }
 
+// ---------------------------- // 2023-11-16 追加
+struct Ball {
+    float position;  // ボールの位置
+    float velocity;  // ボールの速度
+};
+
+Ball balls[3];  // 3つのボールを用意
+// ---------------------------- // 2023-11-16 追加
+
 void NeoPixelEffects::setEffect(EffectType effect)
 {
   _effect = effect;
@@ -74,6 +83,13 @@ void NeoPixelEffects::setEffect(EffectType effect)
   }
   _lastupdate = 0;
   _status = ACTIVE;
+
+  if (effect == BOUNCING) {                           // 2023-11-16 追加
+    for (int i = 0; i < 3; i++) {                     // 2023-11-16 追加
+      balls[i].position = random(_pixstart, _pixend); // 2023-11-16 追加  // ランダムな初期位置
+      balls[i].velocity = random(-5, 5);              // 2023-11-16 追加  // ランダムな初速度
+    }                                                 // 2023-11-16 追加
+  }                                                   // 2023-11-16 追加
 }
 
 void NeoPixelEffects::update()
@@ -137,6 +153,9 @@ void NeoPixelEffects::update()
         case FIRE:                        // 2023-11-13 追加
           updateFireEffect();             // 2023-11-13 追加
           break;                          // 2023-11-13 追加
+        case BOUNCING:                    // 2023-11-16 追加
+          updateBouncingEffect();         // 2023-11-16 追加
+          break;                          // 2023-11-16 追加
         default:
           break;
       }
@@ -607,6 +626,91 @@ void NeoPixelEffects::updateFireEffect() {
     }
 }
 // ---------------------------- // 2023-11-14 追加
+
+
+/*
+// ---------------------------- // 2023-11-16 追加
+void NeoPixelEffects::updateBouncingEffect() {
+    // 各ボールの位置と速度を更新
+    for (int i = 0; i < 3; i++) {
+        balls[i].velocity += -0.1;  // 重力のシミュレーション
+        balls[i].position += balls[i].velocity;
+        
+        // 床に反射
+        if (balls[i].position <= 0) {
+            balls[i].position = 0;
+            // balls[i].velocity = -balls[i].velocity;
+            balls[i].velocity = -balls[i].velocity * 0.9; // 速度を減少させる
+        }
+    }
+
+    // LEDをクリア
+    fill_solid(CRGB::Black);
+
+    // ボールの位置に基づいてLEDの色を設定
+    for (int i = 0; i < 3; i++) {
+        int ledIndex = map(balls[i].position, 0, _pixrange, _pixstart, _pixend);
+        _pixset[ledIndex] = CRGB::Red;  // 赤色で表示（色は変更可能）
+    }
+    // LEDの更新
+    showStrip();
+}
+// ---------------------------- // 2023-11-16 追加
+*/
+// ---------------------------- // 2023-11-18 追加
+constexpr int scale_factor = 1000;
+
+void NeoPixelEffects::updateBouncingEffect() {
+    bool needUpdate = false;
+    bool allBallsStopped = true;
+
+    // _pixaoeに基づいてボールの数を動的に決定
+    int numBalls = _pixaoe; // _pixaoeをボールの数として利用
+
+    for (int i = 0; i < numBalls; i++) {
+        int oldPosition = balls[i].position;
+
+        // 整数演算による重力のシミュレーション
+        balls[i].velocity -= 100; // 速度の減少
+        balls[i].position += balls[i].velocity / scale_factor; // 位置の更新
+
+        // 床に反射
+        if (balls[i].position <= 0) {
+            balls[i].position = 0;
+            balls[i].velocity = -(balls[i].velocity * 90) / 100; // 速度の反転と減少
+
+            if (abs(balls[i].velocity) > 50) {
+                allBallsStopped = false;
+            }
+        } else {
+            allBallsStopped = false;
+        }
+
+        if (oldPosition != balls[i].position) {
+            needUpdate = true;
+        }
+    }
+
+    if (allBallsStopped) {
+        for (int i = 0; i < numBalls; i++) {
+            balls[i].position = random(0, _pixrange);
+            balls[i].velocity = random(-500, 500);
+        }
+        needUpdate = true;
+    }
+
+    if (!needUpdate) return;
+
+    fill_solid(CRGB::Black);
+
+    for (int i = 0; i < numBalls; i++) {
+        int ledIndex = map(balls[i].position, 0, _pixrange, _pixstart, _pixend);
+        _pixset[ledIndex] = _color_fg;
+    }
+
+    showStrip();
+}
+// ---------------------------- // 2023-11-18 追加
 
 
 EffectType NeoPixelEffects::getEffect()

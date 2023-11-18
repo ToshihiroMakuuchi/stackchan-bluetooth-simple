@@ -1029,7 +1029,7 @@ void loop(void)
       if (box_led.contain(t.x, t.y))          // LEDエフェクトタップボタンの追加
       {
         currentEffectIndex++;
-        if (currentEffectIndex > 17) {
+        if (currentEffectIndex > 18) {
           currentEffectIndex = 0;
           }
         effects01.stop();                     // 内蔵LEDのLEDエフェクトを停止
@@ -1113,21 +1113,26 @@ void loop(void)
             effects03 = NeoPixelEffects(pc_leds, FADEINOUT, 0, 59, 3, 0, CRGB::YellowGreen, true, FORWARD);   // ※利用する場合はコメントアウトしてください
             break;
           case 14:
-            effects01 = NeoPixelEffects(internal_leds, NANAIRO, 0, 9, 3, 0, CRGB::LightGoldenrodYellow, true, FORWARD); // PULSEと同一エフェクト (約4秒:七色に順番点灯)
-            effects02 = NeoPixelEffects(pb_leds, NANAIRO, 0, 59, 3, 0, CRGB::Yellow, true, FORWARD);          // ※利用する場合はコメントアウトしてください
-            effects03 = NeoPixelEffects(pc_leds, NANAIRO, 0, 59, 3, 0, CRGB::YellowGreen, true, FORWARD);     // ※利用する場合はコメントアウトしてください
+            effects01 = NeoPixelEffects(internal_leds, NANAIRO, 0, 9, 3, 0, CRGB::Red, true, FORWARD); // PULSEと同一エフェクト (約4秒:七色に順番点灯)
+            effects02 = NeoPixelEffects(pb_leds, NANAIRO, 0, 59, 3, 0, CRGB::Green, true, FORWARD);          // ※利用する場合はコメントアウトしてください
+            effects03 = NeoPixelEffects(pc_leds, NANAIRO, 0, 59, 3, 0, CRGB::Blue, true, FORWARD);     // ※利用する場合はコメントアウトしてください
             break;
           case 15:
-            effects01 = NeoPixelEffects(internal_leds, MERAMERA, 0, 9, 3, 70, CRGB::LightGoldenrodYellow, true, FORWARD); // LED全弾が暖色でメラメラと変化するエフェクト
-            effects02 = NeoPixelEffects(pb_leds, MERAMERA, 0, 59, 3, 70, CRGB::Yellow, true, FORWARD);        // ※利用する場合はコメントアウトしてください
-            effects03 = NeoPixelEffects(pc_leds, MERAMERA, 0, 59, 3, 70, CRGB::YellowGreen, true, FORWARD);   // ※利用する場合はコメントアウトしてください
+            effects01 = NeoPixelEffects(internal_leds, MERAMERA, 0, 9, 3, 70, CRGB::Red, true, FORWARD); // LED全弾が暖色でメラメラと変化するエフェクト
+            effects02 = NeoPixelEffects(pb_leds, MERAMERA, 0, 59, 3, 70, CRGB::Red, true, FORWARD);        // ※利用する場合はコメントアウトしてください
+            effects03 = NeoPixelEffects(pc_leds, MERAMERA, 0, 59, 3, 70, CRGB::Red, true, FORWARD);   // ※利用する場合はコメントアウトしてください
             break;
           case 16:
-            effects01 = NeoPixelEffects(internal_leds, FIRE, 0, 9, 3, 0, CRGB::OrangeRed, true, FORWARD);     // 端に向かって炎が燃え上がるようなエフェクト
-            effects02 = NeoPixelEffects(pb_leds, FIRE, 0, 59, 15, 50, CRGB::MediumTurquoise, true, FORWARD);  // ※利用する場合はコメントアウトしてください
-            effects03 = NeoPixelEffects(pc_leds, FIRE, 0, 59, 15, 0, CRGB::OrangeRed, true, FORWARD);         // ※利用する場合はコメントアウトしてください
+            effects01 = NeoPixelEffects(internal_leds, FIRE, 0, 9, 3, 0, CRGB::Red, true, FORWARD);     // 端に向かって炎が燃え上がるようなエフェクト
+            effects02 = NeoPixelEffects(pb_leds, FIRE, 0, 59, 15, 0, CRGB::Red, true, FORWARD);  // ※利用する場合はコメントアウトしてください
+            effects03 = NeoPixelEffects(pc_leds, FIRE, 0, 59, 15, 0, CRGB::Red, true, FORWARD);         // ※利用する場合はコメントアウトしてください
             break;
           case 17:
+            effects01 = NeoPixelEffects(internal_leds, BOUNCING, 0, 9, 1, 0, CRGB::OrangeRed, true, FORWARD);     // ボールが跳ねるようなエフェクト LED 1～4弾まで
+            effects02 = NeoPixelEffects(pb_leds, BOUNCING, 0, 59, 4, 0, CRGB::DarkSeaGreen, true, FORWARD);       // ※利用する場合はコメントアウトしてください LED 1～4弾まで
+            effects03 = NeoPixelEffects(pc_leds, BOUNCING, 0, 59, 4 , 0, CRGB::DarkBlue, true, FORWARD);          // ※利用する場合はコメントアウトしてください LED 1～4弾まで
+            break;
+          case 18:
             effects01 = NeoPixelEffects(internal_leds, NONE, 0, 9, 3, 10, CRGB::Red, true, FORWARD);          // エフェクト停止
             effects02 = NeoPixelEffects(pb_leds, NONE, 0, 59, 3, 10, CRGB::Red, true, FORWARD);               // ※利用する場合はコメントアウトしてください
             effects03 = NeoPixelEffects(pc_leds, NONE, 0, 59, 3, 10, CRGB::Red, true, FORWARD);               // ※利用する場合はコメントアウトしてください
