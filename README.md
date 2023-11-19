@@ -8,12 +8,13 @@
 
 
 ### エフェクト設定:
-### 起動時:RAINBOW ⇒ COMET ⇒ LARSON ⇒ CHASE ⇒ PULSE ⇒ STATIC ⇒ FILLIN ⇒ GLOW ⇒ STOROBE ⇒ SINEWAVE ⇒ RANDOM <br>
-### 　　⇒ TRIWAVE ⇒ NONE(一旦停止) ⇒ FADEINOUT ⇒ NANAIRO ⇒ MERAMERA ⇒ FIRE ⇒ BOUNCING ⇒ NONE(一旦停止) ⇒ RAINBOW…
+起動時:RAINBOW ⇒ COMET ⇒ LARSON ⇒ CHASE ⇒ PULSE ⇒ STATIC ⇒ FILLIN ⇒ GLOW ⇒ STOROBE ⇒ SINEWAVE ⇒ RANDOM <br>
+⇒ TRIWAVE ⇒ NONE(一旦停止) ⇒ FADEINOUT ⇒ NANAIRO ⇒ MERAMERA ⇒ FIRE ⇒ BOUNCING ⇒ NONE(一旦停止) ⇒ RAINBOW… <br>
+
 
 ### ｽﾀｯｸﾁｬﾝの構成:
-スイッチサイエンス等で販売しているM5Stack純正部品 RGB LED STRIP (100cm/60LED) SK6812を用いて動作確認をしています。
-![h:800](images/stackchan-XmasLED.png)
+スイッチサイエンス等で販売しているM5Stack純正部品 RGB LED STRIP (100cm/60LED) SK6812を用いて動作確認をしています。<br>
+![h:800](images/stackchan-XmasLED.png)<br>
 
 
 ## LEDエフェクト名称および有効パラメータ
