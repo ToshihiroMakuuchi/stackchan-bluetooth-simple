@@ -3,9 +3,18 @@
 
 ---
 ## 2023年11月18日:
-オリジナルのエフェクトを追加しました。<br>
-私自身プログラマではないため、洗練されたエフェクトコードはｗｗｗ <br>
-不具合等あれば教えてください。<br>
+オリジナルのエフェクトを追加しました。しかしながら…私自身プログラマではないため、洗練されたエフェクトコードは書けないっすｗｗｗ <br>
+何か不具合等があれば教えてください。<br>
+
+
+### エフェクト設定:
+### 起動時:RAINBOW ⇒ COMET ⇒ LARSON ⇒ CHASE ⇒ PULSE ⇒ STATIC ⇒ FILLIN ⇒ GLOW ⇒ STOROBE ⇒ SINEWAVE ⇒ RANDOM <br>
+### 　　⇒ TRIWAVE ⇒ NONE(一旦停止) ⇒ FADEINOUT ⇒ NANAIRO ⇒ MERAMERA ⇒ FIRE ⇒ BOUNCING ⇒ NONE(一旦停止) ⇒ RAINBOW…
+
+### ｽﾀｯｸﾁｬﾝの構成:
+スイッチサイエンス等で販売しているM5Stack純正部品 RGB LED STRIP (100cm/60LED) SK6812を用いて動作確認をしています。
+![h:800](images/stackchan-XmasLED.png)
+
 
 ## LEDエフェクト名称および有効パラメータ
 | Name | Range | AoE | Delay | Color | Looping | Direction | Description |
