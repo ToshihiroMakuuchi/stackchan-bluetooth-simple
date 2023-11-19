@@ -10,11 +10,11 @@
 ## LEDエフェクト名称および有効パラメータ
 | Name | Range | AoE | Delay | Color | Looping | Direction | Description |
 | ----: | :-----: | :-----: |  :---: | :-----: | :-------: | :---------: | :--- |
-| ![FADEINOUT](https://youtube.com/shorts/7j3RzVZ8V8k?feature=share) | N | N | N | Y | N | Y | LEDがフェードインアウトするエフェクト (色固定) |
-| ![NANAIRO](https://youtube.com/shorts/aiBonRR6LJo?feature=share) | N | N | N | N | N | Y | LEDがフェードインアウトするエフェクト(七色順番に点灯) |
-| ![MERAMERA](https://youtube.com/shorts/TvK8jyE4r2A?feature=share) | N | N | N | N | N | N | メラメラと燃えるようなエフェクト |
-| ![FIRE](https://youtube.com/shorts/ndaVecUnqKE?feature=share) | N | N | N | N | N | N | 炎が立ち上がるようなエフェクト |
-| ![BOUNCING](https://youtube.com/shorts/cLRLQNVqUdE?feature=share) | N | Y | N | Y | N | N | ボールが弾むようなエフェクト(ボールは最大3つまで) |
+| [![FADEINOUT]](https://youtube.com/shorts/7j3RzVZ8V8k?feature=share) | N | N | N | Y | N | Y | LEDがフェードインアウトするエフェクト (色固定) |
+| [![NANAIRO]](https://youtube.com/shorts/aiBonRR6LJo?feature=share) | N | N | N | N | N | Y | LEDがフェードインアウトするエフェクト(七色順番に点灯) |
+| [![MERAMERA]](https://youtube.com/shorts/TvK8jyE4r2A?feature=share) | N | N | N | N | N | N | メラメラと燃えるようなエフェクト |
+| [![FIRE]](https://youtube.com/shorts/ndaVecUnqKE?feature=share) | N | N | N | N | N | N | 炎が立ち上がるようなエフェクト |
+| [![BOUNCING]](https://youtube.com/shorts/cLRLQNVqUdE?feature=share) | N | Y | N | Y | N | N | ボールが弾むようなエフェクト(ボールは最大3つまで) |
 
 
 ※LoopingがNoであっても繰り返し動作します。
