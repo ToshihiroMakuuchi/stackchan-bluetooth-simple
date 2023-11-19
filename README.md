@@ -10,11 +10,11 @@
 ## LEDエフェクト名称および有効パラメータ
 | Name | Range | AoE | Delay | Color | Looping | Direction | Description |
 | ----: | :-----: | :-----: |  :---: | :-----: | :-------: | :---------: | :--- |
-| [FADEINOUT](https://youtube.com/shorts/7j3RzVZ8V8k?feature=share) | N | N | N | Y | N | Y | LEDがフェードインアウトするエフェクト (色固定) |
-| [NANAIRO](https://youtube.com/shorts/aiBonRR6LJo?feature=share) | N | N | N | N | N | Y | LEDがフェードインアウトするエフェクト(七色順番に点灯) |
-| [MERAMERA](https://youtube.com/shorts/TvK8jyE4r2A?feature=share) | N | N | N | N | N | N | メラメラと燃えるようなエフェクト |
-| [FIRE](https://youtube.com/shorts/ndaVecUnqKE?feature=share) | N | N | N | N | N | N | 炎が立ち上がるようなエフェクト |
-| [BOUNCING](https://youtube.com/shorts/cLRLQNVqUdE?feature=share) | N | Y | N | Y | N | N | ボールが弾むようなエフェクト(ボールは最大3つまで) |
+| [FADEINOUT](https://youtube.com/shorts/7j3RzVZ8V8k?feature=share){:target="_blank"} | N | N | N | Y | N | Y | LEDがフェードインアウトするエフェクト (色固定) |
+| [NANAIRO](https://youtube.com/shorts/aiBonRR6LJo?feature=share){:target="_blank"} | N | N | N | N | N | Y | LEDがフェードインアウトするエフェクト(七色順番に点灯) |
+| [MERAMERA](https://youtube.com/shorts/TvK8jyE4r2A?feature=share){:target="_blank"} | N | N | N | N | N | N | メラメラと燃えるようなエフェクト |
+| [FIRE](https://youtube.com/shorts/ndaVecUnqKE?feature=share){:target="_blank"} | N | N | N | N | N | N | 炎が立ち上がるようなエフェクト |
+| [BOUNCING](https://youtube.com/shorts/cLRLQNVqUdE?feature=share){:target="_blank"} | N | Y | N | Y | N | N | ボールが弾むようなエフェクト(ボールは最大3つまで) |
 
 
 ※LoopingがNoであっても繰り返し動作します。
@@ -84,25 +84,25 @@ robo8080さんが公開している現時点のソースは下記となります
 ## LEDエフェクト名称および有効パラメータ
 | Name | Range | AoE | Delay | Color | Looping | Direction | Description |
 | ----: | :-----: | :-----: |  :---: | :-----: | :-------: | :---------: | :--- |
-| [COMET](https://youtube.com/shorts/wfuuhPH90M0?feature=share) | Y | Y | Y | Y | Y | Y | LED光が尾をを引き設定範囲内を移動する流れ星エフェクト |
-| [LARSON](https://youtube.com/shorts/xl6u4YCUk-E?feature=share) | Y | Y | Y | Y | Y | Y | LED光が設定範囲内を往復するエフェクト(ナイトライダー風) |
-| [CHASE](https://youtube.com/shorts/lTgBS9gDuDU?feature=share) | Y | ? | Y | Y | N | Y | LEDを1つおきに交互に点滅させるエフェクト(工事現場風) |
-| [PULSE](https://youtube.com/shorts/MnvrJHH7iWk?feature=share) | Y | N | Y | Y | Y | N | LEDがゆっくり全点灯、ゆっくり全消灯するフェードインアウトなエフェクト |
-| [STATIC](https://youtube.com/shorts/SkdqZ1L5pXA?feature=share) | Y | N | Y | Y | N | N | 同色がチラチラと点滅するキラキラ系エフェクト |
+| [COMET](https://youtube.com/shorts/wfuuhPH90M0?feature=share){:target="_blank"} | Y | Y | Y | Y | Y | Y | LED光が尾をを引き設定範囲内を移動する流れ星エフェクト |
+| [LARSON](https://youtube.com/shorts/xl6u4YCUk-E?feature=share){:target="_blank"} | Y | Y | Y | Y | Y | Y | LED光が設定範囲内を往復するエフェクト(ナイトライダー風) |
+| [CHASE](https://youtube.com/shorts/lTgBS9gDuDU?feature=share){:target="_blank"} | Y | ? | Y | Y | N | Y | LEDを1つおきに交互に点滅させるエフェクト(工事現場風) |
+| [PULSE](https://youtube.com/shorts/MnvrJHH7iWk?feature=share){:target="_blank"} | Y | N | Y | Y | Y | N | LEDがゆっくり全点灯、ゆっくり全消灯するフェードインアウトなエフェクト |
+| [STATIC](https://youtube.com/shorts/SkdqZ1L5pXA?feature=share){:target="_blank"} | Y | N | Y | Y | N | N | 同色がチラチラと点滅するキラキラ系エフェクト |
 | FADE | Y | N | Y | N | N | N | 設定範囲内でフェードアウトし、全消灯後停止 |
-| [FILLIN](https://youtube.com/shorts/7DqiyXPoloc?feature=share) | Y | N | Y | Y | N | Y | 端から1つずつ点灯し、最後は全点灯するエフェクト(全点灯で停止) |
-| [GLOW](https://youtube.com/shorts/g3MVGf1shLo?feature=share) | Y | Y | Y | Y | N | N | 設定範囲中央からぼんやりと端に向かい点灯後、中央に戻るエフェクト(ランダム) |
-| [RAINBOWWAVE](https://youtube.com/shorts/pfN8k_zY_gs?feature=share) | Y | N | Y | N | N | Y | 動的レインボーグラデーションエフェクト |
-| [STOROBE](https://youtube.com/shorts/o3IekoJ9uqQ?feature=share) | Y | N | Y | Y | N | N | 設定範囲内でのストロボエフェクト(定期的に全LEDピカピカ) |
-| [SINEWAVE](https://youtube.com/shorts/jg9CFqpYKt8?feature=share) | Y | N | Y | Y | N | Y | 設定範囲内のLED数だけ消灯しながら流れるエフェクト(COMETの逆イメージ) |
-| [RANDOM](https://youtube.com/shorts/UXPfDr1h17c?feature=share) | Y | N | Y | N | N | N | LED全部がランダムに点灯するパレード(パリピ)エフェクト |
+| [FILLIN](https://youtube.com/shorts/7DqiyXPoloc?feature=share){:target="_blank"} | Y | N | Y | Y | N | Y | 端から1つずつ点灯し、最後は全点灯するエフェクト(全点灯で停止) |
+| [GLOW](https://youtube.com/shorts/g3MVGf1shLo?feature=share){:target="_blank"} | Y | Y | Y | Y | N | N | 設定範囲中央からぼんやりと端に向かい点灯後、中央に戻るエフェクト(ランダム) |
+| [RAINBOWWAVE](https://youtube.com/shorts/pfN8k_zY_gs?feature=share){:target="_blank"} | Y | N | Y | N | N | Y | 動的レインボーグラデーションエフェクト |
+| [STOROBE](https://youtube.com/shorts/o3IekoJ9uqQ?feature=share){:target="_blank"} | Y | N | Y | Y | N | N | 設定範囲内でのストロボエフェクト(定期的に全LEDピカピカ) |
+| [SINEWAVE](https://youtube.com/shorts/jg9CFqpYKt8?feature=share){:target="_blank"} | Y | N | Y | Y | N | Y | 設定範囲内のLED数だけ消灯しながら流れるエフェクト(COMETの逆イメージ) |
+| [RANDOM](https://youtube.com/shorts/UXPfDr1h17c?feature=share){:target="_blank"} | Y | N | Y | N | N | N | LED全部がランダムに点灯するパレード(パリピ)エフェクト |
 | TALKING | Y | N | Y | Y | N | N | ロボットのリップシンクのようなエフェクト |
-| [TRIWAVE](https://youtube.com/shorts/1XiYPaHgBAA?feature=share) | Y | N | Y | Y | N | Y | LEDが1つずつ消灯しながら流れるエフェクト(COMETの逆イメージ) |
-| [FADEINOUT](https://youtube.com/shorts/7j3RzVZ8V8k?feature=share) | N | N | N | Y | N | Y | LEDがフェードインアウトするエフェクト (色固定) |
-| [NANAIRO](https://youtube.com/shorts/aiBonRR6LJo?feature=share) | N | N | N | N | N | Y | LEDがフェードインアウトするエフェクト(七色順番に点灯) |
-| [MERAMERA](https://youtube.com/shorts/TvK8jyE4r2A?feature=share) | N | N | N | N | N | N | メラメラと燃えるようなエフェクト |
-| [FIRE](https://youtube.com/shorts/ndaVecUnqKE?feature=share) | N | N | N | N | N | N | 炎が立ち上がるようなエフェクト |
-| [BOUNCING](https://youtube.com/shorts/cLRLQNVqUdE?feature=share) | N | Y | N | Y | N | N | ボールが弾むようなエフェクト(ボールは最大3つまで) |
+| [TRIWAVE](https://youtube.com/shorts/1XiYPaHgBAA?feature=share){:target="_blank"} | Y | N | Y | Y | N | Y | LEDが1つずつ消灯しながら流れるエフェクト(COMETの逆イメージ) |
+| [FADEINOUT](https://youtube.com/shorts/7j3RzVZ8V8k?feature=share){:target="_blank"} | N | N | N | Y | N | Y | LEDがフェードインアウトするエフェクト (色固定) |
+| [NANAIRO](https://youtube.com/shorts/aiBonRR6LJo?feature=share){:target="_blank"} | N | N | N | N | N | Y | LEDがフェードインアウトするエフェクト(七色順番に点灯) |
+| [MERAMERA](https://youtube.com/shorts/TvK8jyE4r2A?feature=share){:target="_blank"} | N | N | N | N | N | N | メラメラと燃えるようなエフェクト |
+| [FIRE](https://youtube.com/shorts/ndaVecUnqKE?feature=share){:target="_blank"} | N | N | N | N | N | N | 炎が立ち上がるようなエフェクト |
+| [BOUNCING](https://youtube.com/shorts/cLRLQNVqUdE?feature=share){:target="_blank"} | N | Y | N | Y | N | N | ボールが弾むようなエフェクト(ボールは最大3つまで) |
 | NONE | N | N | N | N | N | N | エフェクトの停止 |
 
 
