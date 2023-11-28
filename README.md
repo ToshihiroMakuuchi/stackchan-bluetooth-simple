@@ -20,7 +20,7 @@
 ![h:800](images/stackchan-XmasLED.png)<br>
 
 
-## LEDエフェクト名称および有効パラメータ
+## 2023年11月版: 追加LEDエフェクト名称および有効パラメータ
 | Name | Range | AoE | Delay | Color | Looping | Direction | Description |
 | ----: | :-----: | :-----: |  :---: | :-----: | :-------: | :---------: | :--- |
 | [FADEINOUT](https://youtube.com/shorts/7j3RzVZ8V8k?feature=share) | N | N | N | Y | N | Y | LEDがフェードインアウトするエフェクト (色固定) |
