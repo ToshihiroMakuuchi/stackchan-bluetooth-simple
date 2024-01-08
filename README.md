@@ -237,4 +237,3 @@ SDカードに`/yaml/SC_Config.yaml`を配置すると自分の設定が利用�
 # Author
 [Takao Akaki](https://github.com/mongonta0716)
 
-
