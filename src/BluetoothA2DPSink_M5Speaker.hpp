@@ -55,6 +55,7 @@ protected:
   int _avatar_expression = 5; // m5stack-avatarの表情取得用
   const char* _avatar_text = "";
   hvtEventCallback _hvt_evt_cb = nullptr;
+  bool is_i2s_output;  // ここに変数を追加 2024-08-17
   uint8_t _virtual_channel = 0;
 
   void clearMetaData(void)
