@@ -11,8 +11,6 @@
 #include <WiFiUdp.h>
 #include <esp_wifi.h>
 #include "Stackchan_servo.h"
-// #include <AudioTools.h>
-// #include <BluetoothA2DPSink.h>
 #include "BluetoothA2DPSink_M5Speaker.hpp"
 #include "Avatar.h"
 #include "Avatar.h"
@@ -73,7 +71,204 @@ static int header_height = 0;
 static int px;  // draw volume bar
 static int prev_x[2];
 static int peak_x[2];
-    
+
+
+// --------------------         2024-08-18
+// LEDの ON/OFF スイッチ
+#define USE_LED                 // ｽﾀｯｸﾁｬﾝでLEDを利用する場合はコメントアウト (内蔵LED、Port.B LED、Port.C LEDのどれを使う場合にもコメントアウト必須)
+#define USE_INTERNAL_LED        // 内蔵LEDを使う場合はコメントアウト
+// #define USE_PB_LED              // Port.BでLEDを使う場合はコメントアウト
+// #define USE_PC_LED              // Port.CでLEDを使う場合はコメントアウト
+#define USE_MEMCHECK            // ヒープメモリの監視を行う場合はコメントアウト
+
+
+// --------------------         2024-08-18
+// LED関連ライブラリの読み込み
+#ifdef USE_LED
+  #include <esp_task_wdt.h>     // ウォッチドッグタイマーのチェック
+  #include <esp_heap_caps.h>    // メモリ監視 2024-08-18
+  #define FASTLED_ALLOW_INTERRUPTS 0
+  #include <FastLED.h>          // FastLED ライブラリ
+  #include "NeoPixelEffects.h"  // LEDエフェクト ライブラリ
+
+// --------------------         2024-08-18
+// FastLED関連の初期設定 (内蔵LED)         // 内蔵LEDを利用する場合#define USB_INTERNAL_LEDのコメントを外してください
+#ifdef USE_INTERNAL_LED
+
+  #define INTERNAL_PIN 25
+  #define INTERNAL_LEDS 10
+
+  int current_EffectIndex = 0;
+  
+  CRGB internal_leds[INTERNAL_LEDS];
+  NeoPixelEffects effects01 = NeoPixelEffects(
+    internal_leds,
+    RAINBOWWAVE,    // エフェクトの種類      effect
+    0,              // エフェクト開始位置    pixstart
+    9,              // エフェクト終了位置    pixend
+    3,              // 点灯範囲 (COMET等)    aoe
+    75,             // エフェクトの間隔      delay_ms
+    CRGB::Green,    // 色 (FastLED 指定色)   color_crgb
+    true,           // ループするかどうか？  looping
+    FORWARD         // エフェクトの方向      direction
+  );
+#endif
+
+// FastLED関連の初期設定 (PORT.B)         // Port.Bを利用する場合#define USB_PB_LEDのコメントを外してください
+#ifdef USE_PB_LED
+
+  #define PORT_B_PIN 26
+  #define PORT_B_LEDS 18      // LED弾数と仕様により可変させてください
+
+  CRGB pb_leds[PORT_B_LEDS];
+  NeoPixelEffects effects02 = NeoPixelEffects(
+    pb_leds,
+    RAINBOWWAVE,    // エフェクトの種類      effect
+    0,              // エフェクト開始位置    pixstart
+    17,             // エフェクト終了位置    pixend
+    5,              // 点灯範囲 (COMET等)    aoe
+    75,             // エフェクトの間隔      delay_ms
+    CRGB::Green,    // 色 (FastLED 指定色)   color_crgb
+    true,           // ループするかどうか？  looping
+    FORWARD         // エフェクトの方向      direction
+  );
+#endif
+
+// FastLED関連の初期設定 (PORT.C)        // Port.Cを利用する場合#define USB_PC_LEDのコメントを外してください
+#ifdef USE_PC_LED
+
+  #define PORT_C_PIN 14
+  #define PORT_C_LEDS 30                  // LEDテープの数と仕様により可変させてください
+
+  CRGB pc_leds[PORT_C_LEDS];
+  NeoPixelEffects effects03 = NeoPixelEffects(
+    pc_leds,
+    RAINBOWWAVE,    // エフェクトの種類      effect
+    0,              // エフェクト開始位置    pixstart
+    59,             // エフェクト終了位置    pixend
+    5,              // 点灯範囲 (COMET等)    aoe
+    20,             // エフェクトの間隔      delay_ms
+    CRGB::Green,    // 色 (FastLED 指定色)   color_crgb
+    true,           // ループするかどうか？  looping
+    FORWARD         // エフェクトの方向      direction
+  );
+#endif
+// FastLED関連の設定 end
+// LEDエフェクトの詳細はこちら:【NeoPixelEffect】 https://github.com/nolanmoore/NeoPixelEffects
+// --------------------
+#endif
+
+
+// --------------------         2024-08-16
+// AIｽﾀｯｸﾁｬﾝ2で利用するエフェクトの種類 (現在は11種を用意 ※最後は消灯)
+#ifdef USE_LED
+void setEffectParameters(int effectIndex, NeoPixelEffects &effects, CRGB* leds, int numLeds) {
+    // 前のエフェクトをクリア
+    effects.stop();
+    FastLED.clear();
+
+    switch (effectIndex) {
+        case 0:
+            effects.setEffect(RAINBOWWAVE);   // レインボーな流れるLED
+            effects.setParameters(75, CRGB::Green, FORWARD);
+            break;
+        case 1:
+            effects.setEffect(COMET);         // 流れ星エフェクト
+            effects.setParameters(75, CRGB::PaleVioletRed, FORWARD);
+            effects.setRepeat(true);
+            break;
+        case 2:
+            effects.setEffect(LARSON);        // 端まで流れて戻ってくるナイトライダー系エフェクト
+            effects.setParameters(75, CRGB::Red, FORWARD);
+            break;
+        case 3:
+            effects.setEffect(CHASE);         // LEDを1弾飛ばしで交互に光らせる工事現場系エフェクト
+            effects.setParameters(120, CRGB::Blue, FORWARD);
+            break;
+        case 4:
+            effects.setEffect(STATIC);        // 同色がチラチラ点滅するキラキラ系エフェクト
+            effects.setParameters(100, CRGB::Orange, FORWARD);
+            break;
+        case 5:
+            effects.setEffect(STROBE);        // ストロボエフェクト (定期的に全LEDピカピカ)
+            effects.setParameters(100, CRGB::OrangeRed, FORWARD);
+            break;
+        case 6:
+            effects.setEffect(SINEWAVE);      // 指定したLED弾数だけ消灯しながら流れるエフェクト (COMETの逆イメージ)
+            effects.setParameters(20, CRGB::Green, FORWARD);
+            break;
+        case 7:
+            effects.setEffect(RANDOM);        // LED全弾がランダムに全色点灯 (パリピエフェクト)
+            effects.setParameters(70, CRGB::Yellow, FORWARD);
+            break;
+        case 8:
+            effects.setEffect(FADEINOUT);     // フェードイン、フェードアウト点灯を繰り返すエフェクト (PULSEと同一)
+            effects.setParameters(20, CRGB::LightGoldenrodYellow, FORWARD);
+            break;
+        case 9:
+            effects.setEffect(NANAIRO);       // FADEINOUTエフェクトを1回ずつ色変えするエフェクト (七色に順番点灯)
+            effects.setParameters(20, CRGB::Green, FORWARD);
+            break;
+        case 10:
+            effects.setEffect(MERAMERA);      // LED全弾が暖色でメラメラと変化するエフェクト
+            effects.setParameters(70, CRGB::Red, FORWARD);
+            break;
+        case 11:
+            effects.setEffect(NONE);          // LED消灯
+            effects.setParameters(10, CRGB::Red, FORWARD);
+            break;
+        default:
+            break;
+    }
+}
+
+void updateLedEffect() {
+
+#ifdef USE_INTERNAL_LED
+        effects01.update();               // エフェクトを適用
+#endif
+#ifdef USE_PB_LED
+        effects02.update();               // エフェクトを適用
+#endif
+#ifdef USE_PC_LED
+        effects03.update();               // エフェクトを適用
+#endif
+        FastLED.show();                   // LEDの状態を更新
+        esp_task_wdt_reset();             // WDTリセットをここで実行
+}
+// 内蔵LEDエフェクトを切り替えるタスク
+void LedEffectTask(void *pvParameters) {
+  while (true) {
+    updateLedEffect();
+    vTaskDelay(50 / portTICK_PERIOD_MS);  // エフェクト更新の遅延
+  }
+}
+
+#endif
+
+
+// --------------------         2024-08-16
+// メモリ監視関数
+#ifdef USE_MEMCHECK
+void monitorHeap() {
+    Serial.print("Free heap Memory [byte]:  ");
+    Serial.println(ESP.getFreeHeap());                                  // 現在のフリーヒープサイズ
+    Serial.print("Largest free block     : ");
+    Serial.println(heap_caps_get_largest_free_block(MALLOC_CAP_8BIT));  // 最大連続ブロックサイズ
+    Serial.print("Total free blocks      : ");
+    Serial.println(heap_caps_get_free_size(MALLOC_CAP_8BIT));           // 合計フリーヒープサイズ
+    Serial.println("================================");
+}
+
+// メモリ監視タスク
+void heapMonitorTask(void *pvParameters) {
+    while (true) {
+        monitorHeap();
+        vTaskDelay(5000 / portTICK_PERIOD_MS);  // 5秒ごとに監視
+    }
+}
+#endif
+
 
 uint32_t bgcolor(LGFX_Device* gfx, int y)
 {
@@ -625,6 +820,49 @@ static box_t box_servo;
 static box_t box_balloon;
 static box_t box_face;
 
+
+#ifdef USE_LED
+static box_t box_led;               // LEDエフェクトタップボタンの追加
+
+// タッチイベントを処理するタスク
+void touchEventTask(void *pvParameters) {
+  while (true) {
+    M5.update();  // M5の状態を更新
+
+    if (M5.Touch.getCount() > 0) { // タッチが検知された場合
+      auto t = M5.Touch.getDetail(); // タッチ情報を取得
+      Serial.printf("Touch detected at (%d, %d)\n", t.x, t.y);
+
+      if (box_led.contain(t.x, t.y)) { // LEDエフェクトタップボタンがタッチされた場合
+
+          // エフェクトインデックスを更新
+          current_EffectIndex = (current_EffectIndex + 1) % 12; // 0から11までのインデックスをループ
+
+#ifdef USE_INTERNAL_LED
+          setEffectParameters(current_EffectIndex, effects01, internal_leds, INTERNAL_LEDS);
+#endif
+#ifdef USE_PB_LED
+          setEffectParameters(current_EffectIndex, effects02, pb_leds, PORT_B_LEDS);
+#endif
+#ifdef USE_PC_LED
+          setEffectParameters(current_EffectIndex, effects03, pc_leds, PORT_C_LEDS);
+#endif
+
+          M5.Speaker.tone(700, 100); // タッチ音の再生          
+          
+      	  Serial.printf("LED effect changed to index: %d\n", current_EffectIndex);
+
+          vTaskDelay(300 / portTICK_PERIOD_MS); // タッチの連続入力を防ぐ
+          continue; // ループの先頭に戻る
+      }
+    }
+
+    vTaskDelay(100 / portTICK_PERIOD_MS); // タッチイベントのポーリング頻度を調整
+  }
+}
+#endif
+
+
 void displevelMeter(bool levelMeter)
 {
   if(levelMeter)
@@ -647,11 +885,13 @@ void displevelMeter(bool levelMeter)
 
 void setup(void)
 {
+  Serial.begin(115200);       // デバッグ用のシリアル通信開始
   auto cfg = M5.config();
 
   cfg.external_spk = true;    /// use external speaker (SPK HAT / ATOMIC SPK)
 //cfg.external_spk_detail.omit_atomic_spk = true; // exclude ATOMIC SPK
 //cfg.external_spk_detail.omit_spk_hat    = true; // exclude SPK HAT
+  cfg.output_power = true;
 
   M5.begin(cfg);
   if (M5.getBoard() == m5::board_t::board_M5Stack) {
@@ -736,11 +976,73 @@ void setup(void)
     avatar.setSpeechText("Normal Mode");
   }
   box_level.setupBox(0, 0, M5.Display.width(), 60);
-  box_servo.setupBox(80, 100, 80, 60);
-  box_face.setupBox(280, 100, 40, 60);
+  box_servo.setupBox(107, 80, 106, 60);                                 // 座標修正 2024-08-16 ※初期値より大きさ修正
+  box_face.setupBox(260, 80, 60, 60);                                   // 座標修正 2024-08-16 ※初期値より大きさ修正
   box_balloon.setupBox(0, 160, M5.Display.width(), 80);
 
+// --------------------			2024-08-16
+// LEDエフェクトをマルチタスクで実行する
+#ifdef USE_LED
+  box_led.setupBox(0, 80, 60, 60);                                       // LEDエフェクトタップボタンの追加
+
+#ifdef USE_INTERNAL_LED
+  FastLED.addLeds<NEOPIXEL, INTERNAL_PIN>(internal_leds, INTERNAL_LEDS);
+  // 起動時に初期エフェクトを設定 (内蔵LED)
+  setEffectParameters(current_EffectIndex, effects01, internal_leds, INTERNAL_LEDS);
+#endif
+#ifdef USE_PB_LED
+  FastLED.addLeds<NEOPIXEL, PORT_B_PIN>(pb_leds, PORT_B_LEDS);
+  // 起動時に初期エフェクトを設定 (Port.B LED)
+  setEffectParameters(current_EffectIndex, effects02, pb_leds, PORT_B_LEDS);
+#endif
+#ifdef USE_PC_LED
+  FastLED.addLeds<NEOPIXEL, PORT_C_PIN>(pc_leds, PORT_C_LEDS);
+  // 起動時に初期エフェクトを設定 (Port.C LED)
+  setEffectParameters(current_EffectIndex, effects03, pc_leds, PORT_C_LEDS);
+#endif
+
+  FastLED.setBrightness(30);
+  FastLED.show(); // 初期状態のLEDを反映
+
+  // 内蔵LEDエフェクトタスクをコア1に作成
+  xTaskCreatePinnedToCore(
+    LedEffectTask,              // タスク関数
+    "LED Effect Task",          // タスク名
+    4096,                       // スタックサイズ
+    NULL,                       // 引数
+    2,                          // 優先度
+    NULL,                       // タスクハンドル
+    1                           // コアID（0または1）
+  );
+  
+  // タッチイベントタスク(右側)をコア0に作成
+  xTaskCreatePinnedToCore(
+    touchEventTask,             // タスク関数
+    "Touch Event Task",         // タスク名
+    4096,                       // スタックサイズ
+    NULL,                       // 引数
+    2,                          // 優先度
+    NULL,                       // タスクハンドル
+    1                           // コアID（0または1）
+  ); 
+#endif
+
+
+#ifdef USE_MEMCHECK
+// --------------------         2024-08-16
+// メモリ監視タスクを起動
+  xTaskCreate(
+	  heapMonitorTask, 		        // タスク関数
+	  "Heap Monitor Task", 	      // タスク名
+	  2048, 					            // スタックサイズ
+	  NULL, 					            // 引数
+	  1, 						              // 優先度
+	  NULL					              // タスクハンドル
+  );
+#endif
+
 }
+
 
 void loop(void)
 {

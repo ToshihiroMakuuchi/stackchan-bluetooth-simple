@@ -59,15 +59,6 @@ NeoPixelEffects::~NeoPixelEffects()
   *_pixset = CRGB();
 }
 
-// ---------------------------- // 2023-11-16 追加
-struct Ball {
-    float position;  // ボールの位置
-    float velocity;  // ボールの速度
-};
-
-Ball balls[3];  // 3つのボールを用意
-// ---------------------------- // 2023-11-16 追加
-
 void NeoPixelEffects::setEffect(EffectType effect)
 {
   _effect = effect;
@@ -77,19 +68,9 @@ void NeoPixelEffects::setEffect(EffectType effect)
   } else {
     _pixcurrent = _pixend;
     _counter = 100;
-    if (effect == TALKING) {
-      _counter = 0;
-    }
   }
   _lastupdate = 0;
   _status = ACTIVE;
-
-  if (effect == BOUNCING) {                           // 2023-11-16 追加
-    for (int i = 0; i < 3; i++) {                     // 2023-11-16 追加
-      balls[i].position = random(_pixstart, _pixend); // 2023-11-16 追加  // ランダムな初期位置
-      balls[i].velocity = random(-5, 5);              // 2023-11-16 追加  // ランダムな初速度
-    }                                                 // 2023-11-16 追加
-  }                                                   // 2023-11-16 追加
 }
 
 void NeoPixelEffects::update()
@@ -99,6 +80,9 @@ void NeoPixelEffects::update()
     if (now - _lastupdate > _delay) {
       _lastupdate = now;
       switch (_effect) {
+        case RAINBOWWAVE:
+          updateRainbowWaveEffect();
+          break;
         case COMET:
           updateCometEffect(0);
           break;
@@ -108,38 +92,17 @@ void NeoPixelEffects::update()
         case CHASE:
           updateChaseEffect();
           break;
-        case PULSE:
-          updatePulseEffect();
-          break;
         case STATIC:
           updateStaticEffect(0);
           break;
         case RANDOM:
           updateStaticEffect(1);
           break;        
-        case FADE:
-          updateFadeOutEffect();
-          break;
-        case FILLIN:
-          updateFillInEffect();
-          break;
-        case GLOW:
-          updateGlowEffect();
-          break;
-        case RAINBOWWAVE:
-          updateRainbowWaveEffect();
-          break;
         case STROBE:
           updateStrobeEffect();
           break;
         case SINEWAVE:
           updateWaveEffect(0);
-          break;
-        case TRIWAVE:
-          updateWaveEffect(1);
-          break;
-        case TALKING:
-          updateTalkingEffect();
           break;
         case FADEINOUT:                   // 2023-11-08 追加
           updateFadeInOutEffect();        // 2023-11-08 追加
@@ -150,12 +113,6 @@ void NeoPixelEffects::update()
         case MERAMERA:                    // 2023-11-13 変更
           updateMerameraEffect();         // 2023-11-13 変更
           break;                          // 2023-11-13 変更
-        case FIRE:                        // 2023-11-13 追加
-          updateFireEffect();             // 2023-11-13 追加
-          break;                          // 2023-11-13 追加
-        case BOUNCING:                    // 2023-11-16 追加
-          updateBouncingEffect();         // 2023-11-16 追加
-          break;                          // 2023-11-16 追加
         default:
           break;
       }
@@ -286,104 +243,6 @@ void NeoPixelEffects::updateStaticEffect(int subtype)
   }
 }
 
-void NeoPixelEffects::updateFadeOutEffect()
-{
-  if (_counter == 0) _counter = 100;
-  float ratio = _counter / 100.0;
-
-  CRGB fadecolor;
-  for (int i = _pixstart; i <= _pixend; i++) {
-    fadecolor = CRGB(_pixset[i].r * ratio, _pixset[i].g * ratio, _pixset[i].b * ratio);
-    _pixset[i] = fadecolor;
-  }
-
-  _counter--;
-
-  if (_counter <= 0 || fadecolor == CRGB(0,0,0)) {
-    pause();
-  }
-}
-
-void NeoPixelEffects::updateFillInEffect()
-{
-  _pixset[_pixcurrent] = _color_fg;
-  if (_direction == FORWARD) {
-    if (_pixcurrent != _pixend) {
-      _pixcurrent++;
-    } else {
-      pause();
-    }
-  } else {
-    if (_pixcurrent != _pixstart) {
-      _pixcurrent--;
-    } else {
-      pause();
-    }
-  }
-}
-
-void NeoPixelEffects::updateGlowEffect()
-{
-  // Ensure glow_area_half is always even
-  if (_pixrange % 2 == 0 && _pixaoe % 2 != 0) {
-    _pixaoe++;
-  } else if (_pixrange % 2 != 0 && _pixaoe % 2 == 0) {
-    _pixaoe--;
-  }
-
-  float ratio = _counter / 100.0;
-  CRGB glowcolor;
-  glowcolor.r = _color_fg.r * ratio;
-  glowcolor.g = _color_fg.g * ratio;
-  glowcolor.b = _color_fg.b * ratio;
-
-  if (_direction == FORWARD) {
-    _counter++;
-    if (_counter >= 100) _direction = REVERSE;
-  } else {
-    _counter--;
-    if (_counter <= 0) {
-      _direction = FORWARD;
-      if (!_repeat) {
-        pause();
-      }
-    }
-  }
-
-  int glow_area_half = (_pixrange - _pixaoe) / 2;
-  for (int i = 0; i < glow_area_half ; i++) {
-    uint8_t denom = glow_area_half + 1 - i;
-    CRGB tempcolor = CRGB(glowcolor.r / denom, glowcolor.g / denom, glowcolor.b / denom);
-    _pixset[_pixstart + i] = tempcolor;
-    _pixset[_pixend - i] = tempcolor;
-  }
-  for (int i = 0; i < _pixaoe; i++) {
-    _pixset[_pixstart + glow_area_half + i] = glowcolor;
-  }
-}
-
-void NeoPixelEffects::updatePulseEffect()
-{
-  CRGB pulsecolor;
-
-  float ratio = _counter / 100.0;
-  pulsecolor.r = _color_fg.r * ratio;
-  pulsecolor.g = _color_fg.g * ratio;
-  pulsecolor.b = _color_fg.b * ratio;
-
-  if (_direction == FORWARD) {
-    _counter++;
-    if (_counter >= 100) _direction = REVERSE;
-  } else {
-    _counter--;
-    if (_counter <= 0) _direction = FORWARD;
-  }
-
-  for (int i = _pixstart; i <= _pixend; i++) {
-    _pixset[i] = pulsecolor;
-  }
-}
-
 void NeoPixelEffects::updateRainbowWaveEffect()
 {
   float ratio = 255.0  / _pixrange;
@@ -410,78 +269,6 @@ void NeoPixelEffects::updateWaveEffect(int subtype)
   }
   _counter = (_direction) ? _counter + 2 : _counter - 2;
 }
-
-void NeoPixelEffects::updateTalkingEffect()
-{
-  // Minimum 6 range
-  static uint8_t init = 1;
-  static uint8_t target_pix = 0;
-  static uint16_t next_update = 0;
-  static unsigned long lastupdate = 0;
-
-  if (init) {
-    _pixaoe = 3;
-    _counter = 0;
-    _direction = FORWARD;
-    init = 0;
-  }
-
-  unsigned long now = millis();
-
-  if (now - lastupdate > next_update) {
-    lastupdate = now;
-    next_update = random16(150, 450); // About the min and max time between syllables
-    target_pix = random8(_pixaoe, _pixrange / 2);
-    _direction = (target_pix > _counter) ? FORWARD : REVERSE;
-  }
-
-  if (_counter != target_pix) {
-    if (_direction == FORWARD) {
-      _counter++;
-    } else {
-      _counter--;
-    }
-  } else {
-    if (target_pix != 0) {
-      target_pix = 0;
-      _direction = REVERSE;
-    } else {
-      if (_direction == REVERSE) {
-        _direction = FORWARD;
-      }
-    }
-  }
-  
-  // clear();
-  // clear() の代わりに、TALKING エフェクトの範囲だけをクリアします。
-  clearRange(_pixstart, _pixend);           // 2023-11-08 clear()からの差替
-
-  if (_counter != 0) {
-    if (_pixrange % 2 != 0) {
-      _pixset[_pixstart + _pixrange / 2] = _color_fg;
-    }
-    for (int i = 0; i < _counter; i++) {
-      _pixset[_pixstart + (_pixrange / 2) - 1 - i] = _color_fg;
-      if (_pixrange % 2 == 0) {
-        _pixset[_pixstart + (_pixrange / 2) + i] = _color_fg;
-      } else {
-        _pixset[_pixstart + (_pixrange / 2) + 1 + i] = _color_fg;
-      }
-    }
-  } else {
-    CRGB dim1 = CRGB(_color_fg.r * 0.2,_color_fg.g * 0.2, _color_fg.b * 0.2);
-    CRGB dim2 = CRGB(_color_fg.r * 0.1,_color_fg.g * 0.1, _color_fg.b * 0.1);
-    _pixset[_pixstart + _pixrange / 2] = dim1;
-    _pixset[_pixstart + _pixrange / 2 + 1] = dim2;
-    if (_pixrange % 2 == 0) {
-      _pixset[_pixstart + _pixrange / 2 - 1] = dim1;
-      _pixset[_pixstart + _pixrange / 2 - 2] = dim2;
-    } else {
-      _pixset[_pixstart + _pixrange / 2 - 1] = dim2;
-    }
-  }
-}
-
 
 // ---------------------------- // 2023-11-08 追加
 //                              // フェードのスピードを調整する変数
@@ -608,110 +395,6 @@ void NeoPixelEffects::updateMerameraEffect() {
   showStrip();
 }
 // ---------------------------- // 2023-11-08 追加
-
-
-// ---------------------------- // 2023-11-14 追加
-void NeoPixelEffects::updateFireEffect() {
-    CRGBPalette16 currentPalette = CRGBPalette16(
-        CRGB::Black, CRGB::Maroon, CRGB::DarkRed, CRGB::DarkRed,
-        CRGB::Red, CRGB::Red, CRGB::DarkOrange, CRGB::DarkOrange,
-        CRGB::Orange, CRGB::Orange, CRGB::FairyLightNCC, CRGB::Yellow,
-        CRGB::Yellow, CRGB::LightYellow, CRGB::Snow, CRGB::White
-    );
-
-    // LED配列の最後から最初に向かって更新
-    for (int i = _pixend; i >= _pixstart; i--) {
-        uint8_t index = inoise8(i * 20, millis() * 3 * _pixrange / 255);
-        _pixset[i] = ColorFromPalette(currentPalette, min((_pixend - i) * (index) >> 6, 255), (_pixend - i) * 255 / _pixrange, LINEARBLEND);
-    }
-}
-// ---------------------------- // 2023-11-14 追加
-
-
-/*
-// ---------------------------- // 2023-11-16 追加
-void NeoPixelEffects::updateBouncingEffect() {
-    // 各ボールの位置と速度を更新
-    for (int i = 0; i < 3; i++) {
-        balls[i].velocity += -0.1;  // 重力のシミュレーション
-        balls[i].position += balls[i].velocity;
-        
-        // 床に反射
-        if (balls[i].position <= 0) {
-            balls[i].position = 0;
-            // balls[i].velocity = -balls[i].velocity;
-            balls[i].velocity = -balls[i].velocity * 0.9; // 速度を減少させる
-        }
-    }
-
-    // LEDをクリア
-    fill_solid(CRGB::Black);
-
-    // ボールの位置に基づいてLEDの色を設定
-    for (int i = 0; i < 3; i++) {
-        int ledIndex = map(balls[i].position, 0, _pixrange, _pixstart, _pixend);
-        _pixset[ledIndex] = CRGB::Red;  // 赤色で表示（色は変更可能）
-    }
-    // LEDの更新
-    showStrip();
-}
-// ---------------------------- // 2023-11-16 追加
-*/
-// ---------------------------- // 2023-11-18 追加
-constexpr int scale_factor = 1000;
-
-void NeoPixelEffects::updateBouncingEffect() {
-    bool needUpdate = false;
-    bool allBallsStopped = true;
-
-    // _pixaoeに基づいてボールの数を動的に決定
-    int numBalls = _pixaoe; // _pixaoeをボールの数として利用
-
-    for (int i = 0; i < numBalls; i++) {
-        int oldPosition = balls[i].position;
-
-        // 整数演算による重力のシミュレーション
-        balls[i].velocity -= 100; // 速度の減少
-        balls[i].position += balls[i].velocity / scale_factor; // 位置の更新
-
-        // 床に反射
-        if (balls[i].position <= 0) {
-            balls[i].position = 0;
-            balls[i].velocity = -(balls[i].velocity * 90) / 100; // 速度の反転と減少
-
-            if (abs(balls[i].velocity) > 50) {
-                allBallsStopped = false;
-            }
-        } else {
-            allBallsStopped = false;
-        }
-
-        if (oldPosition != balls[i].position) {
-            needUpdate = true;
-        }
-    }
-
-    if (allBallsStopped) {
-        for (int i = 0; i < numBalls; i++) {
-            balls[i].position = random(0, _pixrange);
-            balls[i].velocity = random(-500, 500);
-        }
-        needUpdate = true;
-    }
-
-    if (!needUpdate) return;
-
-    fill_solid(CRGB::Black);
-
-    for (int i = 0; i < numBalls; i++) {
-        int ledIndex = map(balls[i].position, 0, _pixrange, _pixstart, _pixend);
-        _pixset[ledIndex] = _color_fg;
-    }
-
-    showStrip();
-}
-// ---------------------------- // 2023-11-18 追加
-
 
 EffectType NeoPixelEffects::getEffect()
 {
@@ -862,3 +545,12 @@ void NeoPixelEffects::showStrip() {
     FastLED.show();
 }
 // ---------------------------- // 2023-11-08 追加
+
+// ---------------------------- // 2024-08-03 追加
+void NeoPixelEffects::setParameters(unsigned long delay, CRGB color_crgb, bool dir) {
+  
+  setDelay(delay);
+  _color_fg = color_crgb;
+  _direction = dir;  
+}
+// ---------------------------- // 2024-08-03 追加

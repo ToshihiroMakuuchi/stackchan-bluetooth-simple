@@ -29,33 +29,23 @@
 #define REVERSE false
 
 enum EffectType {
-  NONE,
+  RAINBOWWAVE,
   COMET,
   LARSON,
   CHASE,
-  PULSE,
   STATIC,
-  FADE,
-  FILLIN,
-  GLOW,
-  RAINBOWWAVE,
   STROBE,
   SINEWAVE,
   RANDOM,
-  TALKING,
-  TRIWAVE,
   FADEINOUT,                // 2023-11-08 追加
   NANAIRO,                  // 2023-11-08 追加
   MERAMERA,                 // 2023-11-13 追加
-  FIRE,                     // 2023-11-13 追加
-  BOUNCING,                 // 2023-11-16 追加
-  NUM_EFFECT
+  NONE
 };
 
 enum EffectStatus {
   INACTIVE,
-  ACTIVE,
-  NUM_EFFECTSTATUS
+  ACTIVE
 };
 
 class NeoPixelEffects {
@@ -79,6 +69,7 @@ class NeoPixelEffects {
 
     void setAll(byte red, byte green, byte blue);         // 2023-11-08 追加
     void showStrip();                                     // 2023-11-08 追加
+    void setParameters(unsigned long delay, CRGB color_crgb, bool dir); // 2024-08-03 追加
 
     void update(); // Process effect
     void stop();
@@ -94,27 +85,21 @@ class NeoPixelEffects {
   private:
     void updateCometEffect(int subtype);
     void updateChaseEffect();
-    void updatePulseEffect();
     void updateStaticEffect(int subtype);
-    void updateFadeOutEffect();
-    void updateFillInEffect();
     void updateSolidEffect();
-    void updateGlowEffect();
     void updateRainbowWaveEffect();
     void updateStrobeEffect();
     void updateWaveEffect(int subtype);
-    void updateTalkingEffect();
     void updateFadeInOutEffect();  // 2023-11-08 追加
     void updateNanairoEffect();    // 2023-11-08 追加
     void updateMerameraEffect();   // 2023-11-13 追加
-    void updateFireEffect();       // 2023-11-13 追加
-    void updateBouncingEffect();   // 2023-11-16 追加
 
     CRGB *_pixset;          // A reference to the one created in the user code
     CRGB _color_fg;
     CRGB _color_bg;
-    EffectType _effect;         // Your silly or awesome effect!
+    EffectType _effect;     // Your silly or awesome effect!
     EffectStatus _status;
+
     int
       fadeValue,            // フェードの値を追跡する   // 2023-11-08 追加
       _pixstart,            // First NeoPixel in range of effect
