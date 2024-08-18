@@ -49,7 +49,7 @@ class StackchanSystemConfig {
         uint8_t _lyrics_num;
 
         void setDefaultParameters();
-        void setSystemConfig(DynamicJsonDocument doc);
+        void setSystemConfig(JsonDocument& doc);
 
     public:
         StackchanSystemConfig();

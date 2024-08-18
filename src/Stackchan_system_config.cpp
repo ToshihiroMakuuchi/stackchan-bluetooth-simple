@@ -70,7 +70,7 @@ void StackchanSystemConfig::loadConfig(fs::FS& fs, const char *yaml_filename) {
     printAllParameters();
 }
 
-void StackchanSystemConfig::setSystemConfig(DynamicJsonDocument doc) {
+void StackchanSystemConfig::setSystemConfig(JsonDocument& doc) {
     JsonObject servo = doc["servo"];
     _servo.servo_pin_x = servo["pin"]["x"];
     _servo.servo_pin_y = servo["pin"]["y"];
