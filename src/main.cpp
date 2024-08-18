@@ -810,7 +810,8 @@ void loop(void)
     }
   }
 
-  if (M5.BtnA.wasDeciedClickCount())
+  if (M5.BtnA.wasDecideClickCount())
+  
   {
     switch (M5.BtnA.getClickCount())
     {
@@ -880,7 +881,7 @@ void loop(void)
   }
 
 #if not(defined(ARDUINO_M5STACK_FIRE) || defined(ARDUINO_M5Stack_Core_ESP32)) // FireはAxp192ではないのとI2Cが使えないので制御できません。
-  if (M5.Power.Axp192.getACINVolatge() < 3.0f) {
+  if (M5.Power.Axp192.getACINVoltage() < 3.0f) {
     // USBからの給電が停止したとき
     // Serial.println("USBPowerUnPlugged.");
     M5.Power.setLed(0);
