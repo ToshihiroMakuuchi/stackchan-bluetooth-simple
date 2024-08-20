@@ -54,7 +54,7 @@ void StackchanSystemConfig::loadConfig(fs::FS& fs, const char *yaml_filename) {
     Serial.printf("----- StackchanSystemConfig::loadConfig:%s\n", yaml_filename);
     File file = fs.open(yaml_filename);
     if (file) {
-        DynamicJsonDocument doc(2048);       // 2024-08-18 見直しするも、警告は回避できないことが分かったため、そのまま利用
+        DynamicJsonDocument doc(2048);
         auto err = deserializeYml( doc, file);
         if (err) {
             Serial.printf("yaml file read error: %s\n", yaml_filename);
@@ -70,7 +70,7 @@ void StackchanSystemConfig::loadConfig(fs::FS& fs, const char *yaml_filename) {
     printAllParameters();
 }
 
-void StackchanSystemConfig::setSystemConfig(JsonDocument& doc) {
+void StackchanSystemConfig::setSystemConfig(DynamicJsonDocument doc) {
     JsonObject servo = doc["servo"];
     _servo.servo_pin_x = servo["pin"]["x"];
     _servo.servo_pin_y = servo["pin"]["y"];

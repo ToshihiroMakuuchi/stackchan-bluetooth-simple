@@ -44,6 +44,7 @@ public:
   static constexpr size_t metatext_num = 3;
 
 protected:
+  // bool is_i2s_output; // 行を追加   2024-08-20
   int16_t* _tri_buf[3] = { nullptr, nullptr, nullptr };
   size_t _tri_buf_size[3] = { 0, 0, 0 };
   size_t _tri_index = 0;
@@ -55,7 +56,6 @@ protected:
   int _avatar_expression = 5; // m5stack-avatarの表情取得用
   const char* _avatar_text = "";
   hvtEventCallback _hvt_evt_cb = nullptr;
-  bool is_i2s_output;  // ここに変数を追加 2024-08-17
   uint8_t _virtual_channel = 0;
 
   void clearMetaData(void)

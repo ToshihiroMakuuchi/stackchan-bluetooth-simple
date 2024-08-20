@@ -77,8 +77,8 @@ static int peak_x[2];
 // LEDの ON/OFF スイッチ
 #define USE_LED                 // ｽﾀｯｸﾁｬﾝでLEDを利用する場合はコメントアウト (内蔵LED、Port.B LED、Port.C LEDのどれを使う場合にもコメントアウト必須)
 #define USE_INTERNAL_LED        // 内蔵LEDを使う場合はコメントアウト
-// #define USE_PB_LED              // Port.BでLEDを使う場合はコメントアウト
-// #define USE_PC_LED              // Port.CでLEDを使う場合はコメントアウト
+#define USE_PB_LED              // Port.BでLEDを使う場合はコメントアウト
+#define USE_PC_LED              // Port.CでLEDを使う場合はコメントアウト
 #define USE_MEMCHECK            // ヒープメモリの監視を行う場合はコメントアウト
 
 
@@ -107,7 +107,7 @@ static int peak_x[2];
     0,              // エフェクト開始位置    pixstart
     9,              // エフェクト終了位置    pixend
     3,              // 点灯範囲 (COMET等)    aoe
-    75,             // エフェクトの間隔      delay_ms
+    50,             // エフェクトの間隔      delay_ms
     CRGB::Green,    // 色 (FastLED 指定色)   color_crgb
     true,           // ループするかどうか？  looping
     FORWARD         // エフェクトの方向      direction
@@ -118,16 +118,16 @@ static int peak_x[2];
 #ifdef USE_PB_LED
 
   #define PORT_B_PIN 26
-  #define PORT_B_LEDS 18      // LED弾数と仕様により可変させてください
+  #define PORT_B_LEDS 32      // LED弾数と仕様により可変させてください
 
   CRGB pb_leds[PORT_B_LEDS];
   NeoPixelEffects effects02 = NeoPixelEffects(
     pb_leds,
     RAINBOWWAVE,    // エフェクトの種類      effect
     0,              // エフェクト開始位置    pixstart
-    17,             // エフェクト終了位置    pixend
-    5,              // 点灯範囲 (COMET等)    aoe
-    75,             // エフェクトの間隔      delay_ms
+    31,             // エフェクト終了位置    pixend     ※LED弾数を変更する場合、ここも忘れずに変更してください！
+    8,              // 点灯範囲 (COMET等)    aoe
+    50,             // エフェクトの間隔      delay_ms
     CRGB::Green,    // 色 (FastLED 指定色)   color_crgb
     true,           // ループするかどうか？  looping
     FORWARD         // エフェクトの方向      direction
@@ -138,16 +138,16 @@ static int peak_x[2];
 #ifdef USE_PC_LED
 
   #define PORT_C_PIN 14
-  #define PORT_C_LEDS 30                  // LEDテープの数と仕様により可変させてください
+  #define PORT_C_LEDS 60                  // LEDテープの数と仕様により可変させてください
 
   CRGB pc_leds[PORT_C_LEDS];
   NeoPixelEffects effects03 = NeoPixelEffects(
     pc_leds,
     RAINBOWWAVE,    // エフェクトの種類      effect
     0,              // エフェクト開始位置    pixstart
-    59,             // エフェクト終了位置    pixend
-    5,              // 点灯範囲 (COMET等)    aoe
-    20,             // エフェクトの間隔      delay_ms
+    59,             // エフェクト終了位置    pixend     ※LED弾数を変更する場合、ここも忘れずに変更してください！
+    8,              // 点灯範囲 (COMET等)    aoe
+    50,             // エフェクトの間隔      delay_ms
     CRGB::Green,    // 色 (FastLED 指定色)   color_crgb
     true,           // ループするかどうか？  looping
     FORWARD         // エフェクトの方向      direction
@@ -170,16 +170,18 @@ void setEffectParameters(int effectIndex, NeoPixelEffects &effects, CRGB* leds, 
     switch (effectIndex) {
         case 0:
             effects.setEffect(RAINBOWWAVE);   // レインボーな流れるLED
-            effects.setParameters(75, CRGB::Green, FORWARD);
+            effects.setParameters(50, CRGB::Green, FORWARD);
             break;
         case 1:
             effects.setEffect(COMET);         // 流れ星エフェクト
-            effects.setParameters(75, CRGB::PaleVioletRed, FORWARD);
+            effects.setAreaOfEffect(8);
+            effects.setParameters(30, CRGB::PaleVioletRed, FORWARD);
             effects.setRepeat(true);
             break;
         case 2:
             effects.setEffect(LARSON);        // 端まで流れて戻ってくるナイトライダー系エフェクト
-            effects.setParameters(75, CRGB::Red, FORWARD);
+            effects.setAreaOfEffect(8);
+            effects.setParameters(30, CRGB::Red, FORWARD);
             break;
         case 3:
             effects.setEffect(CHASE);         // LEDを1弾飛ばしで交互に光らせる工事現場系エフェクト
@@ -191,11 +193,12 @@ void setEffectParameters(int effectIndex, NeoPixelEffects &effects, CRGB* leds, 
             break;
         case 5:
             effects.setEffect(STROBE);        // ストロボエフェクト (定期的に全LEDピカピカ)
-            effects.setParameters(100, CRGB::OrangeRed, FORWARD);
+            effects.setParameters(150, CRGB::OrangeRed, FORWARD);
             break;
         case 6:
             effects.setEffect(SINEWAVE);      // 指定したLED弾数だけ消灯しながら流れるエフェクト (COMETの逆イメージ)
-            effects.setParameters(20, CRGB::Green, FORWARD);
+            effects.setAreaOfEffect(8);
+            effects.setParameters(15, CRGB::Green, FORWARD);
             break;
         case 7:
             effects.setEffect(RANDOM);        // LED全弾がランダムに全色点灯 (パリピエフェクト)
@@ -203,11 +206,11 @@ void setEffectParameters(int effectIndex, NeoPixelEffects &effects, CRGB* leds, 
             break;
         case 8:
             effects.setEffect(FADEINOUT);     // フェードイン、フェードアウト点灯を繰り返すエフェクト (PULSEと同一)
-            effects.setParameters(20, CRGB::LightGoldenrodYellow, FORWARD);
+            effects.setParameters(0, CRGB::LightGoldenrodYellow, FORWARD);
             break;
         case 9:
             effects.setEffect(NANAIRO);       // FADEINOUTエフェクトを1回ずつ色変えするエフェクト (七色に順番点灯)
-            effects.setParameters(20, CRGB::Green, FORWARD);
+            effects.setParameters(0, CRGB::Green, FORWARD);
             break;
         case 10:
             effects.setEffect(MERAMERA);      // LED全弾が暖色でメラメラと変化するエフェクト
@@ -240,7 +243,7 @@ void updateLedEffect() {
 void LedEffectTask(void *pvParameters) {
   while (true) {
     updateLedEffect();
-    vTaskDelay(50 / portTICK_PERIOD_MS);  // エフェクト更新の遅延
+    vTaskDelay(20 / portTICK_PERIOD_MS);  // エフェクト更新の遅延
   }
 }
 
@@ -830,11 +833,12 @@ void touchEventTask(void *pvParameters) {
     M5.update();  // M5の状態を更新
 
     if (M5.Touch.getCount() > 0) { // タッチが検知された場合
+
       auto t = M5.Touch.getDetail(); // タッチ情報を取得
       Serial.printf("Touch detected at (%d, %d)\n", t.x, t.y);
 
       if (box_led.contain(t.x, t.y)) { // LEDエフェクトタップボタンがタッチされた場合
-
+          M5.Speaker.tone(700, 100); // タッチ音の再生     
           // エフェクトインデックスを更新
           current_EffectIndex = (current_EffectIndex + 1) % 12; // 0から11までのインデックスをループ
 
@@ -848,16 +852,13 @@ void touchEventTask(void *pvParameters) {
           setEffectParameters(current_EffectIndex, effects03, pc_leds, PORT_C_LEDS);
 #endif
 
-          M5.Speaker.tone(700, 100); // タッチ音の再生          
-          
       	  Serial.printf("LED effect changed to index: %d\n", current_EffectIndex);
-
-          vTaskDelay(300 / portTICK_PERIOD_MS); // タッチの連続入力を防ぐ
+          vTaskDelay(500 / portTICK_PERIOD_MS); // タッチの連続入力を防ぐ
           continue; // ループの先頭に戻る
       }
     }
 
-    vTaskDelay(100 / portTICK_PERIOD_MS); // タッチイベントのポーリング頻度を調整
+    vTaskDelay(250 / portTICK_PERIOD_MS); // タッチイベントのポーリング頻度を調整
   }
 }
 #endif
