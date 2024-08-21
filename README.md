@@ -2,6 +2,15 @@
 
 
 ---
+## 2024年8月21日:
+先日M5BurnerにアップしたファームウェアVer3.0では、Bluetoothスピーカーでの音割れ、ボタンタッチ音の音割れが確認されました。その為、ファームウェアVer3.1に更新しています。こちらの原因はESP32-A2DPライブラリが1.8.X系だとこの事象が起きてしまう可能性があり、暫定としてVer1.7.5に固定をしております。完全な検証はできていませんが、BluetoothA2DPSink_M5Speaker.hpp のビルドが上手く通らない(AudioToolsを利用する仕様に変更)という不具合に起因する可能性がありました。しばらくは
+
+https://github.com/pschatzmann/ESP32-A2DP.git#v.1.7.5
+
+を利用したいと思います。<br>
+また、併せてPlatformIOのライブラリ見直しも実施しました。ESP32-A2DP以外は最新版のライブラリで問題ありませんでした。(詳しくはPlatformio.iniをご確認ください)<br>
+
+
 ## 2024年8月17日:
 [ｱｦｯｺ](https://x.com/aokko2000)さんのリクエストを受け、LED 70弾に対応しました。また、その調整の過程において BluetoothA2DPSink_M5Speaker.hpp のビルドが上手く通らないという不具合を確認しました。bool is_i2s_output; を1行追加しています。久々の更新だったため、ライブラリの変更等があったのかも知れません。PlatformIOのライブラリ見直しも必要かと思います為、どこかで確認致します。<br>
 
@@ -31,7 +40,7 @@
 | [NANAIRO](https://youtube.com/shorts/aiBonRR6LJo?feature=share) | N | N | N | N | N | Y | LEDがフェードインアウトするエフェクト(七色順番に点灯) |
 | [MERAMERA](https://youtube.com/shorts/TvK8jyE4r2A?feature=share) | N | N | N | N | N | N | メラメラと燃えるようなエフェクト |
 | [FIRE](https://youtube.com/shorts/ndaVecUnqKE?feature=share) | N | N | N | N | N | N | 炎が立ち上がるようなエフェクト |
-| [BOUNCING](https://youtube.com/shorts/cLRLQNVqUdE?feature=share) | N | Y | N | Y | N | N | ボールが弾むようなエフェクト(ボールは最大3つまで) |
+| [BOUNCING](https://youtube.com/shorts/cLRLQNVqUdE?feature=share) | N | Y | N | Y | N | N | ボールが弾むようなエフェクト(ボールは3つ固定) |
 
 
 ※LoopingがNoであっても繰り返し動作します。
@@ -107,7 +116,7 @@ robo8080さんが公開している現時点のソースは下記となります
 | [PULSE](https://youtube.com/shorts/MnvrJHH7iWk?feature=share) | Y | N | Y | Y | Y | N | LEDがゆっくり全点灯、ゆっくり全消灯するフェードインアウトなエフェクト |
 | [STATIC](https://youtube.com/shorts/SkdqZ1L5pXA?feature=share) | Y | N | Y | Y | N | N | 同色がチラチラと点滅するキラキラ系エフェクト |
 | FADE | Y | N | Y | N | N | N | 設定範囲内でフェードアウトし、全消灯後停止 |
-| [FILLIN](https://youtube.com/shorts/7DqiyXPoloc?feature=share) | Y | N | Y | Y | N | Y | 端から1つずつ点灯し、最後は全点灯するエフェクト(全点灯で停止) |
+| [FILLIN](https://youtube.com/shorts/7DqiyXPoloc?feature=share) | Y | N | Y | Y | N | Y | 端から1つずつ点灯し、最後は全点灯するエフェクト(繰り返し対応) |
 | [GLOW](https://youtube.com/shorts/g3MVGf1shLo?feature=share) | Y | Y | Y | Y | N | N | 設定範囲中央からぼんやりと端に向かい点灯後、中央に戻るエフェクト(ランダム) |
 | [RAINBOWWAVE](https://youtube.com/shorts/pfN8k_zY_gs?feature=share) | Y | N | Y | N | N | Y | 動的レインボーグラデーションエフェクト |
 | [STOROBE](https://youtube.com/shorts/o3IekoJ9uqQ?feature=share) | Y | N | Y | Y | N | N | 設定範囲内でのストロボエフェクト(定期的に全LEDピカピカ) |

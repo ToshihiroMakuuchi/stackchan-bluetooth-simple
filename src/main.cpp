@@ -79,7 +79,7 @@ static int peak_x[2];
 #define USE_INTERNAL_LED        // 内蔵LEDを使う場合はコメントアウト
 #define USE_PB_LED              // Port.BでLEDを使う場合はコメントアウト
 #define USE_PC_LED              // Port.CでLEDを使う場合はコメントアウト
-#define USE_MEMCHECK            // ヒープメモリの監視を行う場合はコメントアウト
+// #define USE_MEMCHECK         // ヒープメモリの監視を行う場合はコメントアウト
 
 
 // --------------------         2024-08-18
@@ -118,14 +118,14 @@ static int peak_x[2];
 #ifdef USE_PB_LED
 
   #define PORT_B_PIN 26
-  #define PORT_B_LEDS 32      // LED弾数と仕様により可変させてください
+  #define PORT_B_LEDS 70      // LED弾数と仕様により可変させてください
 
   CRGB pb_leds[PORT_B_LEDS];
   NeoPixelEffects effects02 = NeoPixelEffects(
     pb_leds,
     RAINBOWWAVE,    // エフェクトの種類      effect
     0,              // エフェクト開始位置    pixstart
-    31,             // エフェクト終了位置    pixend     ※LED弾数を変更する場合、ここも忘れずに変更してください！
+    69,             // エフェクト終了位置    pixend     ※LED弾数を変更する場合、ここも忘れずに変更してください！
     8,              // 点灯範囲 (COMET等)    aoe
     50,             // エフェクトの間隔      delay_ms
     CRGB::Green,    // 色 (FastLED 指定色)   color_crgb
@@ -138,14 +138,14 @@ static int peak_x[2];
 #ifdef USE_PC_LED
 
   #define PORT_C_PIN 14
-  #define PORT_C_LEDS 60                  // LEDテープの数と仕様により可変させてください
+  #define PORT_C_LEDS 70                  // LEDテープの数と仕様により可変させてください
 
   CRGB pc_leds[PORT_C_LEDS];
   NeoPixelEffects effects03 = NeoPixelEffects(
     pc_leds,
     RAINBOWWAVE,    // エフェクトの種類      effect
     0,              // エフェクト開始位置    pixstart
-    59,             // エフェクト終了位置    pixend     ※LED弾数を変更する場合、ここも忘れずに変更してください！
+    69,             // エフェクト終了位置    pixend     ※LED弾数を変更する場合、ここも忘れずに変更してください！
     8,              // 点灯範囲 (COMET等)    aoe
     50,             // エフェクトの間隔      delay_ms
     CRGB::Green,    // 色 (FastLED 指定色)   color_crgb
@@ -188,35 +188,62 @@ void setEffectParameters(int effectIndex, NeoPixelEffects &effects, CRGB* leds, 
             effects.setParameters(120, CRGB::Blue, FORWARD);
             break;
         case 4:
+            effects.setEffect(PULSE);         // LED全弾がふわっと点灯 2秒点灯 ゆっくり消灯 (最短6秒)
+            effects.setParameters(0, CRGB::DarkMagenta, FORWARD);
+            break;
+        case 5:
             effects.setEffect(STATIC);        // 同色がチラチラ点滅するキラキラ系エフェクト
             effects.setParameters(100, CRGB::Orange, FORWARD);
             break;
-        case 5:
+        case 6:
+            effects.setEffect(FILLIN);        // 端から1弾ずつ点灯し、最後は全点灯するエフェクト (2024-08-21 繰り返しに対応)
+            effects.setParameters(100, CRGB::RoyalBlue, FORWARD);
+            effects.setRepeat(true);
+            break;
+        case 7:
+            effects.setEffect(GLOW);          // 中央からぼんやり端に向かい点灯後、中央に戻るエフェクト (ランダム)
+            effects.setParameters(0, CRGB::IndianRed, FORWARD);
+            break;        
+        case 8:
             effects.setEffect(STROBE);        // ストロボエフェクト (定期的に全LEDピカピカ)
             effects.setParameters(150, CRGB::OrangeRed, FORWARD);
             break;
-        case 6:
+        case 9:
             effects.setEffect(SINEWAVE);      // 指定したLED弾数だけ消灯しながら流れるエフェクト (COMETの逆イメージ)
             effects.setAreaOfEffect(8);
             effects.setParameters(15, CRGB::Green, FORWARD);
             break;
-        case 7:
+        case 10:
             effects.setEffect(RANDOM);        // LED全弾がランダムに全色点灯 (パリピエフェクト)
             effects.setParameters(70, CRGB::Yellow, FORWARD);
             break;
-        case 8:
+        case 11:
+            effects.setEffect(TRIWAVE);       // LEDが1弾ずつ抜けながら滑らかに流れるエフェクト (COMETの逆イメージ)
+            effects.setParameters(20, CRGB::Yellow, FORWARD);
+            break;
+        case 12:
             effects.setEffect(FADEINOUT);     // フェードイン、フェードアウト点灯を繰り返すエフェクト (PULSEと同一)
             effects.setParameters(0, CRGB::LightGoldenrodYellow, FORWARD);
             break;
-        case 9:
+        case 13:
             effects.setEffect(NANAIRO);       // FADEINOUTエフェクトを1回ずつ色変えするエフェクト (七色に順番点灯)
             effects.setParameters(0, CRGB::Green, FORWARD);
             break;
-        case 10:
+        case 14:
             effects.setEffect(MERAMERA);      // LED全弾が暖色でメラメラと変化するエフェクト
             effects.setParameters(70, CRGB::Red, FORWARD);
             break;
-        case 11:
+        case 15:
+            effects.setEffect(FIRE);          // 端に向かって炎が燃え上がるようなエフェクト
+            effects.setAreaOfEffect(8);
+            effects.setParameters(70, CRGB::Red, FORWARD);
+            break;
+        case 16:
+            effects.setEffect(BOUNCING);      // ボールが跳ねるようなエフェクト LED 3弾固定
+            effects.setAreaOfEffect(3);
+            effects.setParameters(0, CRGB::DarkOliveGreen, FORWARD);
+            break;
+        case 17:
             effects.setEffect(NONE);          // LED消灯
             effects.setParameters(10, CRGB::Red, FORWARD);
             break;
@@ -840,7 +867,7 @@ void touchEventTask(void *pvParameters) {
       if (box_led.contain(t.x, t.y)) { // LEDエフェクトタップボタンがタッチされた場合
           M5.Speaker.tone(700, 100); // タッチ音の再生     
           // エフェクトインデックスを更新
-          current_EffectIndex = (current_EffectIndex + 1) % 12; // 0から11までのインデックスをループ
+          current_EffectIndex = (current_EffectIndex + 1) % 18; // 0から17までのインデックスをループ
 
 #ifdef USE_INTERNAL_LED
           setEffectParameters(current_EffectIndex, effects01, internal_leds, INTERNAL_LEDS);
@@ -1005,7 +1032,7 @@ void setup(void)
   FastLED.setBrightness(30);
   FastLED.show(); // 初期状態のLEDを反映
 
-  // 内蔵LEDエフェクトタスクをコア1に作成
+  // LEDエフェクトタスクをコア1に作成
   xTaskCreatePinnedToCore(
     LedEffectTask,              // タスク関数
     "LED Effect Task",          // タスク名
@@ -1016,7 +1043,7 @@ void setup(void)
     1                           // コアID（0または1）
   );
   
-  // タッチイベントタスク(右側)をコア0に作成
+  // タッチイベントタスクをコア0に作成
   xTaskCreatePinnedToCore(
     touchEventTask,             // タスク関数
     "Touch Event Task",         // タスク名
